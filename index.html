@@ -28,7 +28,7 @@
             margin: auto;
         }
 
-        /* Заголовок сайта */
+        /* Шапка */
         .site-header {
             display: flex;
             align-items: center;
@@ -39,7 +39,7 @@
         .site-header svg {
             width: 36px;
             height: 36px;
-            color: #f6821f; /* Cloudflare Orange */
+            color: #f6821f;
         }
 
         .site-title {
@@ -49,7 +49,7 @@
             letter-spacing: -0.02em;
         }
 
-        /* Контейнер карточки шлюза */
+        /* Карточка шлюза */
         .gateway-card {
             background: #181d27;
             border: 1px solid #283141;
@@ -73,7 +73,7 @@
             margin-bottom: 24px;
         }
 
-        /* Фирменный виджет проверки Cloudflare Turnstile */
+        /* Turnstile виджет */
         .turnstile-box {
             background: #0d1118;
             border: 1px solid #283141;
@@ -92,7 +92,6 @@
             gap: 14px;
         }
 
-        /* Чекбокс / Спиннер */
         .cf-checkbox {
             width: 28px;
             height: 28px;
@@ -153,7 +152,7 @@
             margin-bottom: 2px;
         }
 
-        /* Информационная панель сети */
+        /* Детали подключения */
         .network-details {
             background: #0d1118;
             border: 1px solid #1f2937;
@@ -167,15 +166,70 @@
         .net-row {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            align-items: center;
+            padding: 7px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .net-row:last-child { border-bottom: none; }
         .net-label { color: #6b7280; }
-        .net-val { color: #f3f4f6; font-family: monospace; font-weight: 600; }
 
-        /* Экраны результатов */
+        /* Скрытое приватное значение (Анти-деанон) */
+        .privacy-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .net-val {
+            color: #f3f4f6;
+            font-family: monospace;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .net-val.masked {
+            letter-spacing: 0.15em;
+            color: #9ca3af;
+        }
+
+        /* Кнопка Глаз (показать/скрыть) */
+        .reveal-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #374151;
+            color: #9ca3af;
+            border-radius: 4px;
+            padding: 3px 7px;
+            font-size: 11px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .reveal-btn:hover {
+            background: #252e3e;
+            color: #ffffff;
+            border-color: #4b5563;
+        }
+
+        .reveal-btn svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .streamer-badge {
+            font-size: 10px;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
         .hidden { display: none !important; }
 
         .status-badge {
@@ -258,7 +312,7 @@
             color: #9ca3af;
         }
 
-        /* Подвал в стиле Cloudflare */
+        /* Подвал */
         .footer {
             max-width: 650px;
             width: 100%;
@@ -329,12 +383,41 @@
                 </div>
             </div>
 
-            <!-- Детали подключения -->
+            <!-- Детали подключения с анти-деанон скрытием -->
             <div class="network-details" id="netDetails">
-                <div class="net-row"><span class="net-label">IP-адрес клиента:</span><span class="net-val" id="ipVal">Анализ...</span></div>
-                <div class="net-row"><span class="net-label">Геолокация / Город:</span><span class="net-val" id="locVal">Анализ...</span></div>
-                <div class="net-row"><span class="net-label">Провайдер / AS:</span><span class="net-val" id="ispVal">Анализ...</span></div>
-                <div class="net-row"><span class="net-label">Шлюз фильтрации:</span><span class="net-val" id="statusVal">Инспекция пакетов</span></div>
+                <!-- IP адрес (по умолчанию скрыт звездочками) -->
+                <div class="net-row">
+                    <span class="net-label">IP-адрес клиента:</span>
+                    <div class="privacy-wrap">
+                        <span class="streamer-badge">STREAM-SAFE</span>
+                        <span class="net-val masked" id="ipVal">•••.•••.•••.•••</span>
+                        <button class="reveal-btn" id="toggleIpBtn" onclick="toggleIpVisibility()" title="Показать IP">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <span id="ipBtnText">Показать</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Локация / Город (по умолчанию скрыт) -->
+                <div class="net-row">
+                    <span class="net-label">Геолокация / Город:</span>
+                    <div class="privacy-wrap">
+                        <span class="net-val masked" id="locVal">••••••••••, РФ</span>
+                        <button class="reveal-btn" id="toggleLocBtn" onclick="toggleLocVisibility()" title="Показать город">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <span id="locBtnText">Показать</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="net-row">
+                    <span class="net-label">Провайдер / AS:</span>
+                    <span class="net-val" id="ispVal">Анализ...</span>
+                </div>
+                <div class="net-row">
+                    <span class="net-label">Шлюз фильтрации:</span>
+                    <span class="net-val" id="statusVal">Инспекция пакетов</span>
+                </div>
             </div>
 
             <!-- Блок: УСПЕХ -->
@@ -376,7 +459,7 @@
     <div class="footer">
         <div class="footer-left">
             <span>Ray ID: <span id="rayVal" style="font-family: monospace; color: #d1d5db;">...</span></span>
-            <span>Ваш IP: <span id="footerIp" style="font-family: monospace; color: #d1d5db;">...</span> • Cloudflare Gateway Edge Node</span>
+            <span>Ваш IP: <span id="footerIp" style="font-family: monospace; color: #9ca3af;">•••.•••.•••.•••</span> • Cloudflare Gateway Edge Node</span>
         </div>
         <div>
             <span>Performance & security by <a href="https://www.cloudflare.com" target="_blank">Cloudflare</a></span>
@@ -388,11 +471,51 @@
         const GOV_PATTERNS = ['gov.ru', 'gosuslugi', 'госуслуги', 'spetsvyaz', 'спецсвязь', 'fso', 'фсо', 'fsb', 'фсб', 'mvd', 'мвд', 'mil.ru', 'миноборон', 'rosgvard', 'росгварди', 'customs', 'таможн', 'nalog.gov', 'налог', 'roskomnadzor', 'роскомнадзор', 'rkn', 'ркн', 'grfc', 'грчц', 'duma', 'дума', 'kremlin', 'кремль', 'council.gov', 'minsvyaz', 'digital.gov', 'cbr.ru', 'sudrf', 'genproc', 'sledcom', 'mchs', 'fssp', 'fsin', 'fas.gov', 'rospotrebnadzor', 'rosstat'];
         const GOV_ASNS = [3326, 8342, 3267, 42610, 41668, 31200, 28723, 48434, 50466, 20764];
 
+        // Хранилище реальных данных (для скрытия)
+        let realIpData = "";
+        let realLocationData = "";
+        let isIpRevealed = false;
+        let isLocRevealed = false;
+
+        function toggleIpVisibility() {
+            isIpRevealed = !isIpRevealed;
+            const el = document.getElementById('ipVal');
+            const btnText = document.getElementById('ipBtnText');
+            const footerIp = document.getElementById('footerIp');
+
+            if (isIpRevealed) {
+                el.textContent = realIpData;
+                el.classList.remove('masked');
+                btnText.textContent = "Скрыть";
+                footerIp.textContent = realIpData;
+            } else {
+                el.textContent = "•••.•••.•••.•••";
+                el.classList.add('masked');
+                btnText.textContent = "Показать";
+                footerIp.textContent = "•••.•••.•••.•••";
+            }
+        }
+
+        function toggleLocVisibility() {
+            isLocRevealed = !isLocRevealed;
+            const el = document.getElementById('locVal');
+            const btnText = document.getElementById('locBtnText');
+
+            if (isLocRevealed) {
+                el.textContent = realLocationData;
+                el.classList.remove('masked');
+                btnText.textContent = "Скрыть";
+            } else {
+                el.textContent = "••••••••••, РФ";
+                el.classList.add('masked');
+                btnText.textContent = "Показать";
+            }
+        }
+
         async function runCloudflareChallenge() {
             const ray = Math.random().toString(36).substring(2, 10).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
             document.getElementById('rayVal').textContent = `${ray}`;
 
-            // Имитация фирменного анализа Cloudflare Turnstile (1.2 сек)
             await new Promise(r => setTimeout(r, 1200));
 
             try {
@@ -405,9 +528,11 @@
                 const isp = (data.connection ? (data.connection.isp || data.connection.org) : '') || '';
                 const asn = (data.connection ? data.connection.asn : 0) || 0;
 
-                document.getElementById('ipVal').textContent = ip;
-                document.getElementById('footerIp').textContent = ip;
-                document.getElementById('locVal').textContent = `${city}, ${data.country || 'РФ'}`;
+                // Сохраняем в память для кнопки раскрытия
+                realIpData = ip;
+                realLocationData = `${city}, ${data.country || 'РФ'}`;
+
+                // Показываем только провайдера (он не деанонит)
                 document.getElementById('ispVal').textContent = `${isp} (AS${asn})`;
 
                 const ispLower = isp.toLowerCase();
@@ -422,7 +547,6 @@
                 spinner.classList.add('hidden');
 
                 if (isSchool || isGov || countryCode !== 'RU') {
-                    // Блокировка Cloudflare Access Denied
                     checkbox.classList.add('failed');
                     document.getElementById('cfCrossSvg').classList.remove('hidden');
                     document.getElementById('turnstileText').textContent = 'В доступе отказано';
@@ -430,7 +554,7 @@
                     document.getElementById('statusVal').textContent = 'Заблокировано шлюзом';
                     document.getElementById('statusVal').style.color = '#ef4444';
 
-                    let reason = "Доступ с данного IP ограничен правилами безопасности.";
+                    let reason = "Доступ с данного узла ограничен правилами безопасности.";
                     if (isSchool) reason = "Обнаружено подключение из школьной / образовательной сети ЕСПД.";
                     else if (isGov) reason = "Обнаружена ведомственная подсеть государственных органов РФ.";
                     else if (countryCode !== 'RU') reason = `Доступ заблокирован: регион ${data.country || 'Зарубежье'} не поддерживается.`;
@@ -440,7 +564,6 @@
                     document.getElementById('cardSubtitle').textContent = 'Шлюз безопасности Cloudflare заблокировал ваш сетевой узел.';
                     document.getElementById('deniedBlock').classList.remove('hidden');
                 } else {
-                    // Успех (Гражданский РФ)
                     checkbox.classList.add('success');
                     document.getElementById('cfCheckSvg').classList.remove('hidden');
                     document.getElementById('turnstileText').textContent = 'Успешная верификация';
