@@ -5,16 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jewishtime.fun</title>
     <style>
-        /* Базовые цвета: Светлая тема по умолчанию */
+        /* Базовые цвета: Светлая тема */
         :root {
             --bg-color: #ffffff;
             --text-color: #000000;
             --border-color: #d1d5db;
             --secondary-text: #4b5563;
             --news-bg: #f9fafb;
+            --input-bg: #ffffff;
             --btn-bg: #000000;
             --btn-text: #ffffff;
             --news-date: #9ca3af;
+            --msg-hover: #f3f4f6;
         }
 
         /* Автоматическая Темная тема под систему */
@@ -25,9 +27,11 @@
                 --border-color: #2d3748;
                 --secondary-text: #9ca3af;
                 --news-bg: #171f2c;
+                --input-bg: #131b26;
                 --btn-bg: #f3f4f6;
                 --btn-text: #0f141c;
                 --news-date: #6b7280;
+                --msg-hover: #171f2c;
             }
         }
 
@@ -36,7 +40,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         }
 
         body {
@@ -47,7 +51,7 @@
             flex-direction: column;
         }
 
-        /* 1. ЭКРАН ПРОВЕРКИ */
+        /* 1. ЭКРАН ШЛЮЗА ПРОВЕРКИ */
         #gatewayScreen {
             flex: 1;
             display: flex;
@@ -97,7 +101,6 @@
             flex-shrink: 0;
         }
 
-        /* Кнопка "Продолжить" */
         .continue-btn {
             display: none;
             background-color: var(--btn-bg);
@@ -115,10 +118,6 @@
         .continue-btn:hover {
             opacity: 0.9;
             transform: translateY(-1px);
-        }
-
-        .continue-btn:active {
-            transform: translateY(0);
         }
 
         .accordion-wrapper {
@@ -185,9 +184,12 @@
             display: flex;
             padding: 32px 28px;
             gap: 36px;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
         }
 
-        /* Блок новостей */
+        /* Блок новостей слева */
         .news-box {
             width: 280px;
             border: 1px solid var(--border-color);
@@ -198,6 +200,7 @@
             line-height: 1.5;
             color: var(--text-color);
             flex-shrink: 0;
+            height: fit-content;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -237,9 +240,123 @@
             margin-top: 2px;
         }
 
-        /* Правая зона для сообщений: чистое пространство */
+        /* Правая зона: Живые сообщения пользователей */
         .messages-area {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--news-bg);
+            min-height: 480px;
+            max-height: 700px;
+        }
+
+        .messages-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Отдельное сообщение в ленте */
+        .msg-bubble {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: transparent;
+            transition: background-color 0.15s ease;
+        }
+
+        .msg-bubble:hover {
+            background-color: var(--msg-hover);
+        }
+
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .msg-author {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .msg-time {
+            color: var(--secondary-text);
+            font-size: 11px;
+        }
+
+        .msg-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--text-color);
+            word-break: break-word;
+        }
+
+        /* Форма отправки сообщения */
+        .messages-input-bar {
+            padding: 14px 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background-color: var(--news-bg);
+            border-radius: 0 0 6px 6px;
+        }
+
+        .input-author {
+            width: 110px;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            flex-shrink: 0;
+        }
+
+        .input-author:focus {
+            border-color: var(--text-color);
+        }
+
+        .input-text {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .input-text:focus {
+            border-color: var(--text-color);
+        }
+
+        .send-btn {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border-color);
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            opacity: 0.85;
         }
 
         /* Подвал */
@@ -251,6 +368,19 @@
             color: var(--secondary-text);
             padding: 24px 30px;
             width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                flex-direction: column;
+                padding: 16px;
+            }
+            .news-box {
+                width: 100%;
+            }
+            .input-author {
+                width: 80px;
+            }
         }
     </style>
 </head>
@@ -274,7 +404,6 @@
                 <span class="status-title" id="statusLabel">проверка...</span>
             </div>
 
-            <!-- Кнопка "Продолжить" -->
             <button class="continue-btn" id="continueBtn" onclick="enterSite()">
                 Продолжить
             </button>
@@ -300,14 +429,14 @@
         </div>
     </div>
 
-    <!-- 2. ЭКРАН ОСНОВНОГО САЙТА -->
+    <!-- 2. ЭКРАН ОСНОВНОГО САЙТА С ЖИВЫМИ СООБЩЕНИЯМИ FIREBASE -->
     <div id="mainSite">
         <div class="header">
             jewishtime.fun
         </div>
 
         <div class="content-area">
-            <!-- Блок новостей слева -->
+            <!-- Блок новостей -->
             <div class="news-box">
                 <div class="news-header">Новости</div>
                 <div class="news-item">
@@ -319,8 +448,19 @@
                 </div>
             </div>
 
-            <!-- Правая часть: пустая лента без ИИ-заглушек -->
-            <div class="messages-area"></div>
+            <!-- Правая зона: Живые сообщения от пользователей -->
+            <div class="messages-area">
+                <div class="messages-feed" id="messagesFeed">
+                    <!-- Сообщения подтягиваются из Firebase в реальном времени -->
+                </div>
+
+                <!-- Строка отправки сообщения -->
+                <form class="messages-input-bar" id="msgForm" onsubmit="return false;">
+                    <input type="text" id="msgAuthor" class="input-author" placeholder="Имя" maxlength="20" autocomplete="off">
+                    <input type="text" id="msgText" class="input-text" placeholder="Написать сообщение..." maxlength="300" autocomplete="off">
+                    <button type="submit" id="sendBtn" class="send-btn">Отправить</button>
+                </form>
+            </div>
         </div>
 
         <div class="footer">
@@ -329,6 +469,108 @@
         </div>
     </div>
 
+    <!-- Модуль Firebase (Firestore Realtime) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            query, 
+            orderBy, 
+            limit, 
+            onSnapshot, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Ваш боевой конфиг Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC26Ub9WV7Swfw1lje5KvQe929ufMyiJzU",
+            authDomain: "jewishtime-ae74e.firebaseapp.com",
+            projectId: "jewishtime-ae74e",
+            storageBucket: "jewishtime-ae74e.firebasestorage.app",
+            messagingSenderId: "706590234782",
+            appId: "1:706590234782:web:c7871664445396f7d8c38f",
+            measurementId: "G-1Y30EW35BR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const feedEl = document.getElementById("messagesFeed");
+        const formEl = document.getElementById("msgForm");
+        const authorInput = document.getElementById("msgAuthor");
+        const textInput = document.getElementById("msgText");
+
+        // Запоминаем имя пользователя локально
+        authorInput.value = localStorage.getItem("jt_author") || "";
+
+        // Прослушивание сообщений в реальном времени
+        const q = query(collection(db, "messages"), orderBy("createdAt", "asc"), limit(70));
+        
+        onSnapshot(q, (snapshot) => {
+            feedEl.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const bubble = document.createElement("div");
+                bubble.className = "msg-bubble";
+
+                let timeStr = "";
+                if (data.createdAt && data.createdAt.toDate) {
+                    const d = data.createdAt.toDate();
+                    timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+
+                bubble.innerHTML = `
+                    <div class="msg-meta">
+                        <span class="msg-author">${escapeHtml(data.author || "Аноним")}</span>
+                        <span class="msg-time">${timeStr}</span>
+                    </div>
+                    <div class="msg-text">${escapeHtml(data.text || "")}</div>
+                `;
+                feedEl.appendChild(bubble);
+            });
+
+            // Автопрокрутка вниз к свежим сообщениям
+            feedEl.scrollTop = feedEl.scrollHeight;
+        }, (err) => {
+            console.warn("Firestore listener:", err);
+        });
+
+        // Отправка нового сообщения
+        formEl.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const text = textInput.value.trim();
+            let author = authorInput.value.trim();
+
+            if (!text) return;
+            if (!author) author = "Аноним";
+
+            localStorage.setItem("jt_author", author);
+            textInput.value = "";
+
+            try {
+                await addDoc(collection(db, "messages"), {
+                    author: author,
+                    text: text,
+                    createdAt: serverTimestamp()
+                });
+            } catch (err) {
+                console.error("Ошибка отправки:", err);
+            }
+        });
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+
+    <!-- Скрипт проверки сети и шлюза -->
     <script>
         const SCHOOL_PATTERNS = ['espd', 'еспд', 'informika', 'информика', 'runnet', 'edu.ru', 'edu.gov', 'minobr', 'минобр', 'school', 'shkola', 'школ', 'lyceum', 'лицей', 'gymnasium', 'гимнази', 'college'];
         const GOV_PATTERNS = ['gov.ru', 'gosuslugi', 'госуслуги', 'spetsvyaz', 'спецсвязь', 'fso', 'фсо', 'fsb', 'фсб', 'mvd', 'мвд', 'mil.ru', 'миноборон', 'rosgvard', 'customs', 'nalog.gov', 'roskomnadzor', 'rkn', 'grfc', 'duma', 'kremlin', 'minsvyaz', 'digital.gov', 'cbr.ru', 'sudrf', 'genproc', 'sledcom', 'mchs', 'fssp', 'fsin', 'fas.gov'];
@@ -376,8 +618,6 @@
                     spinner.style.display = "none";
                     check.style.display = "block";
                     label.textContent = "доступ к сайту предоставлен!";
-                    
-                    // Показываем кнопку "Продолжить"
                     continueBtn.style.display = "inline-block";
                 } else {
                     spinner.style.display = "none";
