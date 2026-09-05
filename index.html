@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jewishtime.fun</title>
     <style>
-        /* Базовые переменные: Светлая тема по умолчанию */
+        /* Базовые цвета: Светлая тема по умолчанию */
         :root {
             --bg-color: #ffffff;
             --text-color: #000000;
             --border-color: #d1d5db;
             --secondary-text: #4b5563;
             --news-bg: #f9fafb;
+            --btn-bg: #000000;
+            --btn-text: #ffffff;
+            --news-date: #9ca3af;
         }
 
-        /* Автоматическая темная тема под настройки системы / браузера пользователя */
+        /* Автоматическая Темная тема под систему */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #0f141c;
@@ -22,6 +25,9 @@
                 --border-color: #2d3748;
                 --secondary-text: #9ca3af;
                 --news-bg: #171f2c;
+                --btn-bg: #f3f4f6;
+                --btn-text: #0f141c;
+                --news-date: #6b7280;
             }
         }
 
@@ -41,7 +47,7 @@
             flex-direction: column;
         }
 
-        /* 1. ЭКРАН ПРОВЕРКИ / БЛОКИРОВКИ */
+        /* 1. ЭКРАН ПРОВЕРКИ */
         #gatewayScreen {
             flex: 1;
             display: flex;
@@ -56,7 +62,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 48px;
+            gap: 36px;
         }
 
         .status-box {
@@ -89,6 +95,30 @@
             color: var(--text-color);
             display: none;
             flex-shrink: 0;
+        }
+
+        /* Кнопка "Продолжить" */
+        .continue-btn {
+            display: none;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border-color);
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.15s ease, opacity 0.2s ease;
+        }
+
+        .continue-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .continue-btn:active {
+            transform: translateY(0);
         }
 
         .accordion-wrapper {
@@ -134,14 +164,13 @@
             display: block;
         }
 
-        /* 2. ЭКРАН ОСНОВНОГО САЙТА (СТРОГО 1 В 1 ПО РИСУНКУ) */
+        /* 2. ЭКРАН ОСНОВНОГО САЙТА */
         #mainSite {
             display: none;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        /* Шапка с тонкой линией */
         .header {
             padding: 18px 24px;
             text-align: center;
@@ -151,7 +180,6 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        /* Основной контент (двухколоночный макет) */
         .content-area {
             flex: 1;
             display: flex;
@@ -159,25 +187,59 @@
             gap: 36px;
         }
 
-        /* Левый блок: Новости с тонкой аккуратной границей */
+        /* Блок новостей */
         .news-box {
-            width: 240px;
-            height: 300px;
+            width: 280px;
             border: 1px solid var(--border-color);
             background-color: var(--news-bg);
-            border-radius: 4px;
+            border-radius: 6px;
             padding: 20px;
-            font-size: 17px;
-            font-weight: 400;
-            line-height: 1.4;
-            color: var(--secondary-text);
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-color);
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        /* Правая часть: сообщения от пользователей (чистая пустота без ИИ-заглушек) */
+        .news-header {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--secondary-text);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .news-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .news-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .news-desc {
+            font-size: 13.5px;
+            color: var(--secondary-text);
+            line-height: 1.45;
+        }
+
+        .news-date {
+            font-size: 11px;
+            color: var(--news-date);
+            margin-top: 2px;
+        }
+
+        /* Правая зона для сообщений: чистое пространство */
         .messages-area {
             flex: 1;
-            /* Абсолютно пустое пространство без клишированных надписей */
         }
 
         /* Подвал */
@@ -190,8 +252,6 @@
             padding: 24px 30px;
             width: 100%;
         }
-
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -200,7 +260,6 @@
     <div id="gatewayScreen">
         <div class="center-gateway">
             <div class="status-box">
-                <!-- Вращающиеся стрелки -->
                 <svg class="spinner-svg" id="spinnerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                     <path d="M3 3v5h5"/>
@@ -214,6 +273,11 @@
 
                 <span class="status-title" id="statusLabel">проверка...</span>
             </div>
+
+            <!-- Кнопка "Продолжить" -->
+            <button class="continue-btn" id="continueBtn" onclick="enterSite()">
+                Продолжить
+            </button>
 
             <div class="accordion-wrapper">
                 <div class="accordion-toggle" id="accToggle" onclick="toggleAcc()">
@@ -236,25 +300,29 @@
         </div>
     </div>
 
-    <!-- 2. ЭКРАН САЙТА ПОСЛЕ УСПЕШНОГО ВХОДА (1 В 1 ПО РИСУНКУ) -->
+    <!-- 2. ЭКРАН ОСНОВНОГО САЙТА -->
     <div id="mainSite">
-        <!-- Шапка: jewishtime.fun и тонкая линия -->
         <div class="header">
             jewishtime.fun
         </div>
 
-        <!-- Тело сайта -->
         <div class="content-area">
-            <!-- Блок новостей слева с тонкой рамкой -->
+            <!-- Блок новостей слева -->
             <div class="news-box">
-                тут всякие<br>новости
+                <div class="news-header">Новости</div>
+                <div class="news-item">
+                    <div class="news-title">github проблемы</div>
+                    <div class="news-desc">
+                        У части провайдеров в РФ периодически сбоит доступ к серверам GitHub Pages и зависает проверка SSL-сертификатов. Если сайт не грузится сразу — помогает сброс кэша браузера или смена DNS на 1.1.1.1.
+                    </div>
+                    <div class="news-date">Сегодня</div>
+                </div>
             </div>
 
-            <!-- Правая часть для сообщений (полностью чистая, без навязчивого текста) -->
+            <!-- Правая часть: пустая лента без ИИ-заглушек -->
             <div class="messages-area"></div>
         </div>
 
-        <!-- Подвал -->
         <div class="footer">
             <div>доступ только гражданским узлам связей</div>
             <div>powered by connect.fun</div>
@@ -273,16 +341,20 @@
             body.classList.toggle('open');
         }
 
+        function enterSite() {
+            document.getElementById('gatewayScreen').style.display = "none";
+            document.getElementById('mainSite').style.display = "flex";
+        }
+
         async function startVerification() {
             const label = document.getElementById('statusLabel');
             const spinner = document.getElementById('spinnerIcon');
             const check = document.getElementById('checkIcon');
+            const continueBtn = document.getElementById('continueBtn');
 
-            // 1. проверка...
             label.textContent = "проверка...";
             await new Promise(r => setTimeout(r, 600));
 
-            // 2. ждём ответ от сервиса
             label.textContent = "ждём ответ от сервиса";
 
             try {
@@ -301,33 +373,22 @@
                 await new Promise(r => setTimeout(r, 500));
 
                 if (countryCode === 'RU' && !isSchool && !isGov) {
-                    // Успех
                     spinner.style.display = "none";
                     check.style.display = "block";
                     label.textContent = "доступ к сайту предоставлен!";
-
-                    // Через 1 секунду открываем сайт
-                    setTimeout(() => {
-                        document.getElementById('gatewayScreen').style.display = "none";
-                        const main = document.getElementById('mainSite');
-                        main.style.display = "flex";
-                    }, 1000);
-
+                    
+                    // Показываем кнопку "Продолжить"
+                    continueBtn.style.display = "inline-block";
                 } else {
-                    // Блокировка
                     spinner.style.display = "none";
                     label.textContent = "в доступе отказано: узел заблокирован";
                 }
 
             } catch (e) {
-                // Запасной доступ при сбое сети
                 spinner.style.display = "none";
                 check.style.display = "block";
                 label.textContent = "доступ к сайту предоставлен!";
-                setTimeout(() => {
-                    document.getElementById('gatewayScreen').style.display = "none";
-                    document.getElementById('mainSite').style.display = "flex";
-                }, 1000);
+                continueBtn.style.display = "inline-block";
             }
         }
 
