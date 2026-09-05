@@ -5,306 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jewishtime.fun | Network Gateway</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body {
-            background-color: #0b0f19;
-            color: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .card {
-            background: #131b2e;
-            border: 1px solid #1e293b;
-            border-radius: 16px;
-            max-width: 580px;
-            width: 100%;
-            padding: 40px 32px;
-            text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-        }
-
-        /* Анимация загрузки */
-        .loader {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255,255,255,.1);
-            border-radius: 50%;
-            border-top-color: #3b82f6;
-            animation: spin 1s ease-in-out infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .icon-wrapper {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            margin-bottom: 24px;
-        }
-
-        /* Цвета статусов */
-        .state-blocked .icon-wrapper {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-        .state-success .icon-wrapper {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-        }
-
-        .icon-wrapper svg {
-            width: 32px;
-            height: 32px;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #ffffff;
-        }
-
-        .description {
-            color: #94a3b8;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 24px;
-        }
-
-        /* Карточка с данными IP */
-        .ip-info-box {
-            background: #070a13;
-            border: 1px solid #1e293b;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 24px;
-            text-align: left;
-            font-size: 13px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px solid #131b2e;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: #64748b;
-        }
-
-        .info-value {
-            color: #f1f5f9;
-            font-weight: 600;
-            font-family: monospace;
-        }
-
-        /* Кнопка раскрытия */
-        .toggle-btn {
-            background: #1e293b;
-            color: #cbd5e1;
-            border: 1px solid #334155;
-            padding: 10px 18px;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .toggle-btn:hover {
-            background: #334155;
-            color: #ffffff;
-        }
-
-        .toggle-btn svg {
-            width: 16px;
-            height: 16px;
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-btn.active svg {
-            transform: rotate(180deg);
-        }
-
-        .countries-container {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out, opacity 0.3s ease;
-            opacity: 0;
-            margin-top: 16px;
-            text-align: left;
-        }
-
-        .countries-container.open {
-            max-height: 500px;
-            opacity: 1;
-        }
-
-        .countries-box {
-            background: #070a13;
-            border: 1px solid #1e293b;
-            border-radius: 10px;
-            padding: 16px;
-        }
-
-        .countries-box p {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #64748b;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .country-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            font-size: 13px;
-            color: #cbd5e1;
-        }
-
-        .footer {
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid #1e293b;
-            font-size: 12px;
-            color: #475569;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .card { background: #131b2e; border: 1px solid #1e293b; border-radius: 16px; max-width: 580px; width: 100%; padding: 40px 32px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        .loader { display: inline-block; width: 50px; height: 50px; border: 3px solid rgba(255,255,255,.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .icon-wrapper { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; margin-bottom: 24px; }
+        .state-blocked .icon-wrapper { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .state-success .icon-wrapper { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .icon-wrapper svg { width: 32px; height: 32px; }
+        h1 { font-size: 24px; font-weight: 700; margin-bottom: 12px; color: #ffffff; }
+        .description { color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+        .ip-info-box { background: #070a13; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; margin-bottom: 24px; text-align: left; font-size: 13px; }
+        .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #131b2e; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #64748b; }
+        .info-value { color: #f1f5f9; font-weight: 600; font-family: monospace; }
+        .toggle-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 10px 18px; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .toggle-btn svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
+        .toggle-btn.active svg { transform: rotate(180deg); }
+        .countries-container { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s ease; opacity: 0; margin-top: 16px; text-align: left; }
+        .countries-container.open { max-height: 500px; opacity: 1; }
+        .countries-box { background: #070a13; border: 1px solid #1e293b; border-radius: 10px; padding: 16px; }
+        .countries-box p { font-size: 12px; text-transform: uppercase; color: #64748b; margin-bottom: 12px; font-weight: 600; }
+        .country-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 13px; color: #cbd5e1; }
+        .footer { margin-top: 32px; padding-top: 20px; border-top: 1px solid #1e293b; font-size: 12px; color: #475569; display: flex; justify-content: space-between; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
-    <div class="card" id="mainCard">
-        <!-- 1. Состояние загрузки -->
+    <div class="card">
+        <!-- 1. Загрузка -->
         <div id="loadingState">
             <div class="loader"></div>
             <h1>Анализ подключения...</h1>
-            <p class="description">Проверка сетевого шлюза, региона и цифрового слепа автономной системы.</p>
+            <p class="description">Проверка сетевого шлюза, региона и цифрового следа подсети.</p>
         </div>
 
-        <!-- 2. Состояние: БЛОКИРОВКА (Чужие страны или ГОС-интернет) -->
+        <!-- 2. Блокировка -->
         <div id="blockedState" class="state-blocked hidden">
             <div class="icon-wrapper">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                </svg>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
             </div>
             <h1>Сервис недоступен в вашем регионе</h1>
-            <p class="description" id="blockReason">
-                Доступ ограничен политикой региональной безопасности сервиса jewishtime.fun.
-            </p>
+            <p class="description" id="blockReason">Доступ ограничен политикой региональной безопасности сервиса jewishtime.fun.</p>
 
-            <!-- Детектор данных IP -->
             <div class="ip-info-box">
-                <div class="info-row">
-                    <span class="info-label">Ваш IP-адрес:</span>
-                    <span class="info-value" id="userIp">Определяется...</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Локация / Город:</span>
-                    <span class="info-value" id="userLocation">—</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Провайдер / ASN:</span>
-                    <span class="info-value" id="userIsp">—</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Статус сети:</span>
-                    <span class="info-value" style="color: #ef4444;" id="userNetStatus">Ограничено</span>
-                </div>
+                <div class="info-row"><span class="info-label">Ваш IP-адрес:</span><span class="info-value" id="userIp">—</span></div>
+                <div class="info-row"><span class="info-label">Локация / Город:</span><span class="info-value" id="userLocation">—</span></div>
+                <div class="info-row"><span class="info-label">Провайдер / Сеть:</span><span class="info-value" id="userIsp">—</span></div>
+                <div class="info-row"><span class="info-label">Статус безопасности:</span><span class="info-value" style="color: #ef4444;" id="userNetStatus">Заблокировано</span></div>
             </div>
 
-            <!-- Раскрывающийся список -->
             <button class="toggle-btn" id="toggleButton" onclick="toggleCountries()">
                 <span>Показать список ограничений</span>
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
-                </svg>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
             </button>
 
             <div class="countries-container" id="countriesContainer">
                 <div class="countries-box">
-                    <p>Регионы и сети, находящиеся под фильтрацией:</p>
+                    <p>Сети и регионы под ограничениями:</p>
                     <div class="country-grid">
                         <div>🚫 Все страны вне РФ</div>
-                        <div>🏛️ Российские Гос-сети</div>
-                        <div>🛡️ Ведомственные ASN</div>
-                        <div>📡 Спецсвязь / ФСО / МВД</div>
+                        <div>🏛️ Гос-сети и ведомства РФ</div>
+                        <div>🛡️ Подсети ФСБ / МВД / МО</div>
+                        <div>📡 Спецсвязь и каналы ОГВ</div>
                         <div>🔒 Tor & DataCenter Proxy</div>
-                        <div>⛔ Санкционные регионы</div>
+                        <div>⛔ Санкционные зоны</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Состояние: УСПЕХ (Обычный интернет РФ) -->
+        <!-- 3. Успех -->
         <div id="successState" class="state-success hidden">
             <div class="icon-wrapper">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-                </svg>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h1>Доступ разрешен</h1>
-            <p class="description">
-                Региональная проверка пройдена. Ваше подключение идентифицировано как гражданский сегмент РФ.
-            </p>
-
+            <p class="description">Региональная проверка пройдена. Подключение идентифицировано как гражданский сегмент РФ.</p>
             <div class="ip-info-box">
-                <div class="info-row">
-                    <span class="info-label">Ваш IP:</span>
-                    <span class="info-value" id="successIp">—</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Город:</span>
-                    <span class="info-value" id="successLocation">—</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Провайдер:</span>
-                    <span class="info-value" id="successIsp">—</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Верификация:</span>
-                    <span class="info-value" style="color: #22c55e;">Проверено (Гражданский РФ)</span>
-                </div>
+                <div class="info-row"><span class="info-label">Ваш IP:</span><span class="info-value" id="successIp">—</span></div>
+                <div class="info-row"><span class="info-label">Город:</span><span class="info-value" id="successLocation">—</span></div>
+                <div class="info-row"><span class="info-label">Провайдер:</span><span class="info-value" id="successIsp">—</span></div>
+                <div class="info-row"><span class="info-label">Верификация:</span><span class="info-value" style="color: #22c55e;">Проверено (Гражданский РФ)</span></div>
             </div>
-
-            <p style="color: #94a3b8; font-size: 14px;">Добро пожаловать на платформу <strong>jewishtime.fun</strong></p>
         </div>
 
-        <!-- Футер -->
         <div class="footer">
             <span id="rayId">Ray ID: checking...</span>
             <span>jewishtime.fun</span>
@@ -312,15 +99,10 @@
     </div>
 
     <script>
-        // Список паттернов российских гос-сетей и ведомств
-        const GOV_PATTERNS = [
-            'gov.ru', 'gosuslugi', 'spetsvyaz', 'спецсвязь', 
-            'fso', 'fsb', 'mvd', 'mil.ru', 'customs.gov', 'nalog.gov', 
-            'roskomnadzor', 'rkn', 'grfc', 'duma', 'kremlin',
-            'minsvyaz', 'digital.gov', 'state', 'federal'
-        ];
+        // Черный список IP (сегмент ФСБ РФ)
+        const FSB_BLACKLIST = ['62.33.43.202'];
 
-        // Специальные ведомственные ASN (ФСО, Спецсвязь, Гос-сегмент Ростелекома и др.)
+        const GOV_PATTERNS = ['gov.ru', 'gosuslugi', 'spetsvyaz', 'спецсвязь', 'fso', 'fsb', 'mvd', 'mil.ru', 'customs.gov', 'nalog.gov', 'roskomnadzor', 'rkn', 'grfc', 'duma', 'kremlin', 'minsvyaz', 'digital.gov'];
         const GOV_ASNS = [3326, 8342, 42610, 28723, 41668, 31200];
 
         async function verifyNetwork() {
@@ -328,54 +110,42 @@
             document.getElementById('rayId').textContent = `Ray ID: ${ray}_NODE`;
 
             try {
-                // Запрос к сервису определения реального IP
                 const res = await fetch('https://ipwho.is/');
                 const data = await res.json();
 
                 document.getElementById('loadingState').classList.add('hidden');
 
-                if (!data.success) {
-                    showBlocked("Ошибка проверки региональной принадлежности.");
-                    return;
-                }
-
-                const ip = data.ip || 'Неизвестен';
+                const ip = data.ip || '';
                 const countryCode = data.country_code || '';
-                const city = data.city || data.region || 'Не определен';
+                const city = data.city || 'Не определен';
                 const isp = (data.connection ? (data.connection.isp || data.connection.org) : '') || '';
                 const asn = (data.connection ? data.connection.asn : 0) || 0;
 
-                // Проверка: является ли сеть государственной
                 const ispLower = isp.toLowerCase();
                 const isGov = GOV_ASNS.includes(asn) || GOV_PATTERNS.some(p => ispLower.includes(p));
+                const isFsbIp = FSB_BLACKLIST.includes(ip);
 
-                // Логика доступа: разрешено ТОЛЬКО для РФ, но НЕ для гос-сетей
-                if (countryCode === 'RU' && !isGov) {
-                    // УСПЕШНЫЙ ВХОД
+                if (isFsbIp) {
+                    showBlocked(
+                        "Внимание: Обнаружено подключение из ведомственного сегмента ФСБ РФ. Доступ к гражданскому ресурсу заблокирован.",
+                        ip, `${city}, Россия`, `${isp} (FSB_SPECIAL_SUBNET)`, "Заблокировано (ФСБ РФ)"
+                    );
+                } else if (countryCode === 'RU' && !isGov) {
                     document.getElementById('successState').classList.remove('hidden');
                     document.getElementById('successIp').textContent = ip;
                     document.getElementById('successLocation').textContent = `${city}, Россия`;
                     document.getElementById('successIsp').textContent = isp;
                 } else {
-                    // БЛОКИРОВКА
-                    let reason = "Доступ к сервису разрешен исключительно из гражданского сегмента РФ.";
-                    if (isGov) {
-                        reason = "Внимание: Обнаружено подключение из государственной или ведомственной сети РФ. Доступ ограничен.";
-                    } else if (countryCode !== 'RU') {
-                        reason = `Ваша страна (${data.country || countryCode}) находится в списке региональных ограничений.`;
-                    }
-
-                    showBlocked(reason, ip, `${city}, ${data.country || 'Зарубежье'}`, `${isp} (AS${asn})`, isGov ? 'Гос-сеть РФ' : 'Вне региона');
+                    let reason = isGov ? "Обнаружена государственная сеть РФ." : `Регион ${data.country || 'Зарубежье'} находится под ограничениями.`;
+                    showBlocked(reason, ip, `${city}, ${data.country || 'Зарубежье'}`, `${isp} (AS${asn})`, "Доступ ограничен");
                 }
-
             } catch (err) {
-                // Если сработал AdBlock или нет связи
                 document.getElementById('loadingState').classList.add('hidden');
-                showBlocked("Не удалось подтвердить легитимность региона подключения.", "Скрыт / Заблокирован", "Не определен", "Не определен", "Ошибка верификации");
+                showBlocked("Ошибка верификации сети.", "—", "—", "—", "Ошибка");
             }
         }
 
-        function showBlocked(reason, ip = '—', location = '—', isp = '—', status = 'Заблокировано') {
+        function showBlocked(reason, ip, location, isp, status) {
             document.getElementById('blockedState').classList.remove('hidden');
             document.getElementById('blockReason').textContent = reason;
             document.getElementById('userIp').textContent = ip;
@@ -388,7 +158,6 @@
             const container = document.getElementById('countriesContainer');
             const button = document.getElementById('toggleButton');
             const spanText = button.querySelector('span');
-
             if (container.classList.contains('open')) {
                 container.classList.remove('open');
                 button.classList.remove('active');
@@ -400,7 +169,6 @@
             }
         }
 
-        // Запуск при открытии страницы
         verifyNetwork();
     </script>
 </body>
