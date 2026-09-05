@@ -5,47 +5,321 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jewishtime.fun | Network Gateway</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .card { background: #131b2e; border: 1px solid #1e293b; border-radius: 16px; max-width: 600px; width: 100%; padding: 40px 32px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
-        .loader { display: inline-block; width: 50px; height: 50px; border: 3px solid rgba(255,255,255,.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; margin-bottom: 20px; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+        }
+
+        body { 
+            background-color: #080c16; 
+            color: #e2e8f0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Фоновое мягкое свечение */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+            animation: pulseGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+        }
+
+        /* Карточка с эффектом стекла и плавной анимацией появления */
+        .card { 
+            background: rgba(19, 27, 46, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 20px; 
+            max-width: 600px; 
+            width: 100%; 
+            padding: 44px 36px; 
+            text-align: center; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03); 
+            position: relative;
+            z-index: 1;
+            animation: cardAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes cardAppear {
+            0% { opacity: 0; transform: translateY(30px) scale(0.97); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Контейнер состояний с плавным переключением */
+        .view-state {
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .view-state.fade-out {
+            opacity: 0;
+            transform: scale(0.96);
+            pointer-events: none;
+        }
+
+        .view-state.fade-in {
+            animation: viewFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes viewFadeIn {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Лоадер */
+        .loader-wrapper {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 24px;
+        }
+
+        .loader { 
+            width: 60px; 
+            height: 60px; 
+            border: 3px solid rgba(59, 130, 246, 0.15); 
+            border-radius: 50%; 
+            border-top-color: #3b82f6; 
+            animation: spin 1s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite; 
+        }
+
+        .loader-pulse {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
         @keyframes spin { to { transform: rotate(360deg); } }
-        .icon-wrapper { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; margin-bottom: 24px; }
-        .state-blocked .icon-wrapper { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-        .state-success .icon-wrapper { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
-        .icon-wrapper svg { width: 32px; height: 32px; }
-        h1 { font-size: 24px; font-weight: 700; margin-bottom: 12px; color: #ffffff; }
-        .description { color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
-        .ip-info-box { background: #070a13; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; margin-bottom: 24px; text-align: left; font-size: 13px; }
-        .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #131b2e; }
+        @keyframes pulseRing {
+            0% { transform: scale(0.85); opacity: 0.8; }
+            100% { transform: scale(1.35); opacity: 0; }
+        }
+
+        /* Иконка статуса */
+        .icon-wrapper { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 72px; 
+            height: 72px; 
+            border-radius: 50%; 
+            margin-bottom: 24px; 
+            animation: iconPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes iconPop {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .state-blocked .icon-wrapper { 
+            background: rgba(239, 68, 68, 0.12); 
+            color: #ef4444; 
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
+        }
+
+        .state-success .icon-wrapper { 
+            background: rgba(34, 197, 94, 0.12); 
+            color: #22c55e; 
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.25);
+        }
+
+        .icon-wrapper svg { width: 36px; height: 36px; }
+
+        h1 { 
+            font-size: 25px; 
+            font-weight: 700; 
+            margin-bottom: 12px; 
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+
+        .description { 
+            color: #94a3b8; 
+            font-size: 15px; 
+            line-height: 1.6; 
+            margin-bottom: 28px; 
+        }
+
+        /* Информационный бокс IP */
+        .ip-info-box { 
+            background: rgba(7, 10, 19, 0.7); 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            border-radius: 14px; 
+            padding: 18px 20px; 
+            margin-bottom: 24px; 
+            text-align: left; 
+            font-size: 13.5px; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .info-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 9px 0; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04); 
+            opacity: 0;
+            transform: translateX(-10px);
+            animation: rowSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .info-row:nth-child(1) { animation-delay: 0.15s; }
+        .info-row:nth-child(2) { animation-delay: 0.25s; }
+        .info-row:nth-child(3) { animation-delay: 0.35s; }
+        .info-row:nth-child(4) { animation-delay: 0.45s; }
+
+        @keyframes rowSlide {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         .info-row:last-child { border-bottom: none; }
-        .info-label { color: #64748b; }
-        .info-value { color: #f1f5f9; font-weight: 600; font-family: monospace; }
-        .toggle-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 10px 18px; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-        .toggle-btn svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
+        .info-label { color: #64748b; font-weight: 500; }
+        .info-value { color: #f1f5f9; font-weight: 600; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+        /* Кнопка с мягкой физикой нажатия */
+        .toggle-btn { 
+            background: #1e293b; 
+            color: #cbd5e1; 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            padding: 12px 22px; 
+            font-size: 14px; 
+            font-weight: 500; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 10px; 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .toggle-btn:hover { 
+            background: #283548; 
+            color: #ffffff; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .toggle-btn svg { 
+            width: 16px; 
+            height: 16px; 
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+
         .toggle-btn.active svg { transform: rotate(180deg); }
-        .countries-container { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s ease; opacity: 0; margin-top: 16px; text-align: left; }
-        .countries-container.open { max-height: 500px; opacity: 1; }
-        .countries-box { background: #070a13; border: 1px solid #1e293b; border-radius: 10px; padding: 16px; }
-        .countries-box p { font-size: 12px; text-transform: uppercase; color: #64748b; margin-bottom: 12px; font-weight: 600; }
-        .country-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 13px; color: #cbd5e1; }
-        .footer { margin-top: 32px; padding-top: 20px; border-top: 1px solid #1e293b; font-size: 12px; color: #475569; display: flex; justify-content: space-between; }
+
+        /* Выпадающий список с плавной анимацией высоты */
+        .countries-container { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; 
+            opacity: 0; 
+            margin-top: 18px; 
+            text-align: left; 
+        }
+
+        .countries-container.open { 
+            max-height: 500px; 
+            opacity: 1; 
+        }
+
+        .countries-box { 
+            background: rgba(7, 10, 19, 0.85); 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            border-radius: 12px; 
+            padding: 18px 20px; 
+        }
+
+        .countries-box p { 
+            font-size: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.06em; 
+            color: #64748b; 
+            margin-bottom: 14px; 
+            font-weight: 700; 
+        }
+
+        .country-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            font-size: 13px; 
+            color: #cbd5e1; 
+        }
+
+        .country-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .country-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .footer { 
+            margin-top: 36px; 
+            padding-top: 20px; 
+            border-top: 1px solid rgba(255, 255, 255, 0.05); 
+            font-size: 12px; 
+            color: #475569; 
+            display: flex; 
+            justify-content: space-between; 
+            letter-spacing: 0.02em;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <div class="card">
         <!-- 1. Загрузка -->
-        <div id="loadingState">
-            <div class="loader"></div>
+        <div id="loadingState" class="view-state">
+            <div class="loader-wrapper">
+                <div class="loader"></div>
+                <div class="loader-pulse"></div>
+            </div>
             <h1>Анализ подключения...</h1>
             <p class="description">Проверка цифрового следа шлюза на принадлежность к ведомственным и школьным сетям.</p>
         </div>
 
         <!-- 2. Блокировка -->
-        <div id="blockedState" class="state-blocked hidden">
+        <div id="blockedState" class="view-state state-blocked hidden">
             <div class="icon-wrapper">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
             </div>
             <h1>Сервис недоступен в вашем регионе</h1>
             <p class="description" id="blockReason">Доступ ограничен политикой безопасности ресурса jewishtime.fun.</p>
@@ -59,30 +333,30 @@
 
             <button class="toggle-btn" id="toggleButton" onclick="toggleCountries()">
                 <span>Показать список ограничений</span>
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+                <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
             </button>
 
             <div class="countries-container" id="countriesContainer">
                 <div class="countries-box">
-                    <p>Категории сетей, находящиеся под полной блокировкой:</p>
+                    <p>Категории сетей под полной блокировкой:</p>
                     <div class="country-grid">
-                        <div>🚫 Все страны вне РФ</div>
-                        <div>🏫 Школьные сети и ЕСПД</div>
-                        <div>🎓 Образовательные госсети (RUNNet)</div>
-                        <div>🏛️ Гос-органы и ведомства РФ</div>
-                        <div>🛡️ Подсети ФСБ / МВД / МО / ФСО</div>
-                        <div>📡 Спецсвязь и правительственный контур</div>
-                        <div>⚖️ Судебные сети и прокуратура</div>
-                        <div>🔒 Tor, VPN и дата-центры</div>
+                        <div class="country-item">🚫 Все страны вне РФ</div>
+                        <div class="country-item">🏫 Школьные сети и ЕСПД</div>
+                        <div class="country-item">🎓 Госсети ВУЗов (RUNNet)</div>
+                        <div class="country-item">🏛️ Гос-органы и ведомства</div>
+                        <div class="country-item">🛡️ ФСБ / МВД / МО / ФСО</div>
+                        <div class="country-item">📡 Спецсвязь и контур ОГВ</div>
+                        <div class="country-item">⚖️ Судебные сети и надзор</div>
+                        <div class="country-item">🔒 Tor, VPN и DataCenters</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- 3. Успех -->
-        <div id="successState" class="state-success hidden">
+        <div id="successState" class="view-state state-success hidden">
             <div class="icon-wrapper">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h1>Доступ разрешен</h1>
             <p class="description">Региональная проверка пройдена. Подключение верифицировано как гражданский сегмент РФ.</p>
@@ -102,14 +376,12 @@
     </div>
 
     <script>
-        // Школьные и образовательные государственные паттерны (ЕСПД, Информика, РУННЕТ и т.д.)
         const SCHOOL_PATTERNS = [
             'espd', 'еспд', 'informika', 'информика', 'runnet', 'edu.ru', 'edu.gov',
             'minobr', 'минобр', 'obrazovanie', 'school', 'shkola', 'школ', 'lyceum',
             'лицей', 'gymnasium', 'гимнази', 'college', 'колледж', 'pedagog', 'prosv'
         ];
 
-        // Паттерны федеральных и региональных органов власти РФ
         const GOV_PATTERNS = [
             'gov.ru', 'gosuslugi', 'госуслуги', 'spetsvyaz', 'спецсвязь',
             'fso', 'фсо', 'fsb', 'фсб', 'mvd', 'мвд', 'mil.ru', 'миноборон',
@@ -123,29 +395,27 @@
             'pfrf.ru', 'sfr.gov', 'пенсионн', 'adm', 'мэрия', 'правительств'
         ];
 
-        // Номера автономных систем (ASN) гос-структур, образовательных госсетей и ведомств
-        const GOV_ASNS = [
-            3326,  // Спецсвязь ФСО РФ
-            8342,  // РТКомм (Гос-сегмент Ростелекома)
-            3267,  // RUNNet (Федеральная образовательная сеть РФ / ВУЗы и школы)
-            42610, // Ведомственные ФГУП
-            41668, // ФСО РФ
-            31200, // ФГУП ВНИИПВТИ / Минцифры
-            28723, // Государственные правительственные сети
-            48434, // ЕСПД Ростелеком (Единая сеть передачи данных для школ РФ)
-            50466, // Органы государственной власти и муниципалитеты
-            20764  // Ведомственные каналы связи
-        ];
+        const GOV_ASNS = [3326, 8342, 3267, 42610, 41668, 31200, 28723, 48434, 50466, 20764];
+
+        function switchView(targetStateId) {
+            const loading = document.getElementById('loadingState');
+            loading.classList.add('fade-out');
+            
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                const target = document.getElementById(targetStateId);
+                target.classList.remove('hidden');
+                target.classList.add('fade-in');
+            }, 300);
+        }
 
         async function verifyNetwork() {
             const ray = Math.random().toString(36).substring(2, 10).toUpperCase();
-            document.getElementById('rayId').textContent = `Ray ID: ${ray}_NODE`;
+            document.getElementById('rayId').textContent = `Ray ID: ${ray}_GATEWAY`;
 
             try {
                 const res = await fetch('https://ipwho.is/');
                 const data = await res.json();
-
-                document.getElementById('loadingState').classList.add('hidden');
 
                 const ip = data.ip || '';
                 const countryCode = data.country_code || '';
@@ -157,7 +427,6 @@
                 const domainLower = (data.connection && data.connection.domain ? data.connection.domain.toLowerCase() : '');
                 const fullNetString = `${ispLower} ${domainLower}`;
 
-                // Проверки
                 const isSchool = asn === 48434 || asn === 3267 || SCHOOL_PATTERNS.some(p => fullNetString.includes(p));
                 const isGov = GOV_ASNS.includes(asn) || GOV_PATTERNS.some(p => fullNetString.includes(p));
 
@@ -166,30 +435,32 @@
                         "Внимание: Обнаружено подключение из школьной или государственной образовательной сети (ЕСПД / Минпросвещения). Доступ заблокирован.",
                         ip, `${city}, Россия`, `${isp} (ЕСПД_ШКОЛА_РФ)`, "Заблокировано (Школьная сеть)"
                     );
+                    switchView('blockedState');
                 } else if (isGov) {
                     showBlocked(
                         "Внимание: Обнаружено подключение из государственной или ведомственной сети РФ. Доступ заблокирован правилами безопасности.",
                         ip, `${city}, Россия`, `${isp} (GOV_NET_AS${asn})`, "Заблокировано (Гос-орган РФ)"
                     );
+                    switchView('blockedState');
                 } else if (countryCode === 'RU') {
-                    document.getElementById('successState').classList.remove('hidden');
                     document.getElementById('successIp').textContent = ip;
                     document.getElementById('successLocation').textContent = `${city}, Россия`;
                     document.getElementById('successIsp').textContent = isp;
+                    switchView('successState');
                 } else {
                     showBlocked(
                         `Ваш регион (${data.country || 'Зарубежье'}) находится под ограничениями. Сервис доступен только из гражданского сегмента РФ.`,
                         ip, `${city}, ${data.country || 'Зарубежье'}`, `${isp} (AS${asn})`, "Вне региона"
                     );
+                    switchView('blockedState');
                 }
             } catch (err) {
-                document.getElementById('loadingState').classList.add('hidden');
                 showBlocked("Ошибка верификации сети.", "—", "—", "—", "Ошибка проверки");
+                switchView('blockedState');
             }
         }
 
         function showBlocked(reason, ip, location, isp, status) {
-            document.getElementById('blockedState').classList.remove('hidden');
             document.getElementById('blockReason').textContent = reason;
             document.getElementById('userIp').textContent = ip;
             document.getElementById('userLocation').textContent = location;
