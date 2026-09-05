@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .card { background: #131b2e; border: 1px solid #1e293b; border-radius: 16px; max-width: 580px; width: 100%; padding: 40px 32px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        .card { background: #131b2e; border: 1px solid #1e293b; border-radius: 16px; max-width: 600px; width: 100%; padding: 40px 32px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
         .loader { display: inline-block; width: 50px; height: 50px; border: 3px solid rgba(255,255,255,.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .icon-wrapper { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; margin-bottom: 24px; }
@@ -39,7 +39,7 @@
         <div id="loadingState">
             <div class="loader"></div>
             <h1>Анализ подключения...</h1>
-            <p class="description">Проверка сетевого шлюза, региона и цифрового следа подсети.</p>
+            <p class="description">Проверка цифрового следа шлюза на принадлежность к ведомственным и школьным сетям.</p>
         </div>
 
         <!-- 2. Блокировка -->
@@ -48,13 +48,13 @@
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
             </div>
             <h1>Сервис недоступен в вашем регионе</h1>
-            <p class="description" id="blockReason">Доступ ограничен политикой региональной безопасности сервиса jewishtime.fun.</p>
+            <p class="description" id="blockReason">Доступ ограничен политикой безопасности ресурса jewishtime.fun.</p>
 
             <div class="ip-info-box">
                 <div class="info-row"><span class="info-label">Ваш IP-адрес:</span><span class="info-value" id="userIp">—</span></div>
                 <div class="info-row"><span class="info-label">Локация / Город:</span><span class="info-value" id="userLocation">—</span></div>
                 <div class="info-row"><span class="info-label">Провайдер / Сеть:</span><span class="info-value" id="userIsp">—</span></div>
-                <div class="info-row"><span class="info-label">Статус безопасности:</span><span class="info-value" style="color: #ef4444;" id="userNetStatus">Заблокировано</span></div>
+                <div class="info-row"><span class="info-label">Статус фильтра:</span><span class="info-value" style="color: #ef4444;" id="userNetStatus">Заблокировано</span></div>
             </div>
 
             <button class="toggle-btn" id="toggleButton" onclick="toggleCountries()">
@@ -64,14 +64,16 @@
 
             <div class="countries-container" id="countriesContainer">
                 <div class="countries-box">
-                    <p>Сети и регионы под ограничениями:</p>
+                    <p>Категории сетей, находящиеся под полной блокировкой:</p>
                     <div class="country-grid">
                         <div>🚫 Все страны вне РФ</div>
-                        <div>🏛️ Гос-сети и ведомства РФ</div>
-                        <div>🛡️ Подсети ФСБ / МВД / МО</div>
-                        <div>📡 Спецсвязь и каналы ОГВ</div>
-                        <div>🔒 Tor & DataCenter Proxy</div>
-                        <div>⛔ Санкционные зоны</div>
+                        <div>🏫 Школьные сети и ЕСПД</div>
+                        <div>🎓 Образовательные госсети (RUNNet)</div>
+                        <div>🏛️ Гос-органы и ведомства РФ</div>
+                        <div>🛡️ Подсети ФСБ / МВД / МО / ФСО</div>
+                        <div>📡 Спецсвязь и правительственный контур</div>
+                        <div>⚖️ Судебные сети и прокуратура</div>
+                        <div>🔒 Tor, VPN и дата-центры</div>
                     </div>
                 </div>
             </div>
@@ -83,13 +85,14 @@
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h1>Доступ разрешен</h1>
-            <p class="description">Региональная проверка пройдена. Подключение идентифицировано как гражданский сегмент РФ.</p>
+            <p class="description">Региональная проверка пройдена. Подключение верифицировано как гражданский сегмент РФ.</p>
             <div class="ip-info-box">
                 <div class="info-row"><span class="info-label">Ваш IP:</span><span class="info-value" id="successIp">—</span></div>
                 <div class="info-row"><span class="info-label">Город:</span><span class="info-value" id="successLocation">—</span></div>
                 <div class="info-row"><span class="info-label">Провайдер:</span><span class="info-value" id="successIsp">—</span></div>
                 <div class="info-row"><span class="info-label">Верификация:</span><span class="info-value" style="color: #22c55e;">Проверено (Гражданский РФ)</span></div>
             </div>
+            <p style="color: #94a3b8; font-size: 14px;">Добро пожаловать на платформу <strong>jewishtime.fun</strong></p>
         </div>
 
         <div class="footer">
@@ -99,11 +102,40 @@
     </div>
 
     <script>
-        // Черный список IP (сегмент ФСБ РФ)
-        const FSB_BLACKLIST = [];
+        // Школьные и образовательные государственные паттерны (ЕСПД, Информика, РУННЕТ и т.д.)
+        const SCHOOL_PATTERNS = [
+            'espd', 'еспд', 'informika', 'информика', 'runnet', 'edu.ru', 'edu.gov',
+            'minobr', 'минобр', 'obrazovanie', 'school', 'shkola', 'школ', 'lyceum',
+            'лицей', 'gymnasium', 'гимнази', 'college', 'колледж', 'pedagog', 'prosv'
+        ];
 
-        const GOV_PATTERNS = ['gov.ru', 'gosuslugi', 'spetsvyaz', 'спецсвязь', 'fso', 'fsb', 'mvd', 'mil.ru', 'customs.gov', 'nalog.gov', 'roskomnadzor', 'rkn', 'grfc', 'duma', 'kremlin', 'minsvyaz', 'digital.gov'];
-        const GOV_ASNS = [3326, 8342, 42610, 28723, 41668, 31200];
+        // Паттерны федеральных и региональных органов власти РФ
+        const GOV_PATTERNS = [
+            'gov.ru', 'gosuslugi', 'госуслуги', 'spetsvyaz', 'спецсвязь',
+            'fso', 'фсо', 'fsb', 'фсб', 'mvd', 'мвд', 'mil.ru', 'миноборон',
+            'rosgvard', 'росгварди', 'customs', 'таможн', 'nalog.gov', 'налог',
+            'roskomnadzor', 'роскомнадзор', 'rkn', 'ркн', 'grfc', 'грчц',
+            'duma', 'дума', 'kremlin', 'кремль', 'council.gov', 'sovfed',
+            'minsvyaz', 'digital.gov', 'минцифр', 'cbr.ru', 'центробанк',
+            'sudrf', 'суд', 'genproc', 'прокуратур', 'sledcom', 'следственн',
+            'mchs', 'мчс', 'fssp', 'пристав', 'fsin', 'фсин', 'fas.gov',
+            'rospotrebnadzor', 'роспотребнадзор', 'rosstat', 'росстат',
+            'pfrf.ru', 'sfr.gov', 'пенсионн', 'adm', 'мэрия', 'правительств'
+        ];
+
+        // Номера автономных систем (ASN) гос-структур, образовательных госсетей и ведомств
+        const GOV_ASNS = [
+            3326,  // Спецсвязь ФСО РФ
+            8342,  // РТКомм (Гос-сегмент Ростелекома)
+            3267,  // RUNNet (Федеральная образовательная сеть РФ / ВУЗы и школы)
+            42610, // Ведомственные ФГУП
+            41668, // ФСО РФ
+            31200, // ФГУП ВНИИПВТИ / Минцифры
+            28723, // Государственные правительственные сети
+            48434, // ЕСПД Ростелеком (Единая сеть передачи данных для школ РФ)
+            50466, // Органы государственной власти и муниципалитеты
+            20764  // Ведомственные каналы связи
+        ];
 
         async function verifyNetwork() {
             const ray = Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -122,26 +154,37 @@
                 const asn = (data.connection ? data.connection.asn : 0) || 0;
 
                 const ispLower = isp.toLowerCase();
-                const isGov = GOV_ASNS.includes(asn) || GOV_PATTERNS.some(p => ispLower.includes(p));
-                const isFsbIp = FSB_BLACKLIST.includes(ip);
+                const domainLower = (data.connection && data.connection.domain ? data.connection.domain.toLowerCase() : '');
+                const fullNetString = `${ispLower} ${domainLower}`;
 
-                if (isFsbIp) {
+                // Проверки
+                const isSchool = asn === 48434 || asn === 3267 || SCHOOL_PATTERNS.some(p => fullNetString.includes(p));
+                const isGov = GOV_ASNS.includes(asn) || GOV_PATTERNS.some(p => fullNetString.includes(p));
+
+                if (isSchool) {
                     showBlocked(
-                        "Внимание: Обнаружено подключение из ведомственного сегмента ФСБ РФ. Доступ к гражданскому ресурсу заблокирован.",
-                        ip, `${city}, Россия`, `${isp} (FSB_SPECIAL_SUBNET)`, "Заблокировано (ФСБ РФ)"
+                        "Внимание: Обнаружено подключение из школьной или государственной образовательной сети (ЕСПД / Минпросвещения). Доступ заблокирован.",
+                        ip, `${city}, Россия`, `${isp} (ЕСПД_ШКОЛА_РФ)`, "Заблокировано (Школьная сеть)"
                     );
-                } else if (countryCode === 'RU' && !isGov) {
+                } else if (isGov) {
+                    showBlocked(
+                        "Внимание: Обнаружено подключение из государственной или ведомственной сети РФ. Доступ заблокирован правилами безопасности.",
+                        ip, `${city}, Россия`, `${isp} (GOV_NET_AS${asn})`, "Заблокировано (Гос-орган РФ)"
+                    );
+                } else if (countryCode === 'RU') {
                     document.getElementById('successState').classList.remove('hidden');
                     document.getElementById('successIp').textContent = ip;
                     document.getElementById('successLocation').textContent = `${city}, Россия`;
                     document.getElementById('successIsp').textContent = isp;
                 } else {
-                    let reason = isGov ? "Обнаружена государственная сеть РФ." : `Регион ${data.country || 'Зарубежье'} находится под ограничениями.`;
-                    showBlocked(reason, ip, `${city}, ${data.country || 'Зарубежье'}`, `${isp} (AS${asn})`, "Доступ ограничен");
+                    showBlocked(
+                        `Ваш регион (${data.country || 'Зарубежье'}) находится под ограничениями. Сервис доступен только из гражданского сегмента РФ.`,
+                        ip, `${city}, ${data.country || 'Зарубежье'}`, `${isp} (AS${asn})`, "Вне региона"
+                    );
                 }
             } catch (err) {
                 document.getElementById('loadingState').classList.add('hidden');
-                showBlocked("Ошибка верификации сети.", "—", "—", "—", "Ошибка");
+                showBlocked("Ошибка верификации сети.", "—", "—", "—", "Ошибка проверки");
             }
         }
 
