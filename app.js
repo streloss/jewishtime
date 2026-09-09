@@ -165,30 +165,30 @@ function initSession() {
 
 function updateUserUI() {
     if (!currentUser) {
-        headerAvatar.textContent = "?";
-        superAdminBtn.style.display = "none";
-        roleBanner.style.display = "none";
-        fabAddBtn.style.display = "none";
+        if (headerAvatar) headerAvatar.textContent = "?";
+        if (superAdminBtn) superAdminBtn.style.display = "none";
+        if (roleBanner) roleBanner.style.display = "none";
+        if (fabAddBtn) fabAddBtn.style.display = "none";
         if (guestBannerAuthBtn) guestBannerAuthBtn.style.display = "none";
         if (menuGuestAuth) menuGuestAuth.style.display = "none";
         return;
     }
 
     if (currentUser.isGuest) {
-        headerAvatar.textContent = "Г";
-        profileAvatarLarge.textContent = "Г";
-        profileNameDisplay.textContent = "Гость (Демо-режим)";
-        profileRoleBadge.textContent = "Демо";
+        if (headerAvatar) headerAvatar.textContent = "Г";
+        if (profileAvatarLarge) profileAvatarLarge.textContent = "Г";
+        if (profileNameDisplay) profileNameDisplay.textContent = "Гость (Демо-режим)";
+        if (profileRoleBadge) profileRoleBadge.textContent = "Демо";
 
-        superAdminBtn.style.display = "none";
-        menuSuperAdmin.style.display = "none";
+        if (superAdminBtn) superAdminBtn.style.display = "none";
+        if (menuSuperAdmin) menuSuperAdmin.style.display = "none";
         if (menuGuestAuth) menuGuestAuth.style.display = "flex";
 
-        roleBanner.style.display = "flex";
-        roleBannerText.textContent = "Демо-режим: просмотр заданий без комментариев";
+        if (roleBanner) roleBanner.style.display = "flex";
+        if (roleBannerText) roleBannerText.textContent = "Демо-режим: просмотр заданий без комментариев";
         if (guestBannerAuthBtn) guestBannerAuthBtn.style.display = "inline-flex";
 
-        fabAddBtn.style.display = "none";
+        if (fabAddBtn) fabAddBtn.style.display = "none";
         return;
     }
 
@@ -196,32 +196,32 @@ function updateUserUI() {
     if (menuGuestAuth) menuGuestAuth.style.display = "none";
 
     const initial = (currentUser.fullName || currentUser.username || "У")[0].toUpperCase();
-    headerAvatar.textContent = initial;
-    profileAvatarLarge.textContent = initial;
-    profileNameDisplay.textContent = currentUser.fullName || currentUser.username;
+    if (headerAvatar) headerAvatar.textContent = initial;
+    if (profileAvatarLarge) profileAvatarLarge.textContent = initial;
+    if (profileNameDisplay) profileNameDisplay.textContent = currentUser.fullName || currentUser.username;
     
     let roleText = "Ученик";
     if (currentUser.role === "class_admin" || currentUser.role === "admin") roleText = "Администратор";
     if (currentUser.role === "super_admin") roleText = "Главный Админ";
-    profileRoleBadge.textContent = roleText;
+    if (profileRoleBadge) profileRoleBadge.textContent = roleText;
 
     if (currentUser.role === "super_admin") {
-        superAdminBtn.style.display = "flex";
-        menuSuperAdmin.style.display = "flex";
-        roleBanner.style.display = "flex";
-        roleBannerText.textContent = "Главный Админ";
-        fabAddBtn.style.display = "inline-flex";
+        if (superAdminBtn) superAdminBtn.style.display = "flex";
+        if (menuSuperAdmin) menuSuperAdmin.style.display = "flex";
+        if (roleBanner) roleBanner.style.display = "flex";
+        if (roleBannerText) roleBannerText.textContent = "Главный Админ";
+        if (fabAddBtn) fabAddBtn.style.display = "inline-flex";
     } else if (currentUser.role === "class_admin" || currentUser.role === "admin") {
-        superAdminBtn.style.display = "none";
-        menuSuperAdmin.style.display = "none";
-        roleBanner.style.display = "flex";
-        roleBannerText.textContent = "Режим администратора";
-        fabAddBtn.style.display = "inline-flex";
+        if (superAdminBtn) superAdminBtn.style.display = "none";
+        if (menuSuperAdmin) menuSuperAdmin.style.display = "none";
+        if (roleBanner) roleBanner.style.display = "flex";
+        if (roleBannerText) roleBannerText.textContent = "Режим администратора";
+        if (fabAddBtn) fabAddBtn.style.display = "inline-flex";
     } else {
-        superAdminBtn.style.display = "none";
-        menuSuperAdmin.style.display = "none";
-        roleBanner.style.display = "none";
-        fabAddBtn.style.display = "none";
+        if (superAdminBtn) superAdminBtn.style.display = "none";
+        if (menuSuperAdmin) menuSuperAdmin.style.display = "none";
+        if (roleBanner) roleBanner.style.display = "none";
+        if (fabAddBtn) fabAddBtn.style.display = "none";
     }
 }
 
