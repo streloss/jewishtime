@@ -301,7 +301,16 @@
         <!-- 3. PROFILE MODAL -->
         <div class="modal-backdrop" id="profileModalBackdrop">
             <div class="bottom-sheet profile-sheet" id="profileSheet">
-                <div class="sheet-drag-handle"></div>
+                <div class="sheet-drag-handle" id="profileDragHandle"></div>
+                <div class="sheet-top">
+                    <div class="sheet-heading">
+                        <span class="material-symbols-outlined sheet-icon brand-color">account_circle</span>
+                        <h2 class="sheet-title">Мой профиль</h2>
+                    </div>
+                    <button class="icon-btn" id="closeProfileSheetBtn" aria-label="Закрыть">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
                 <div class="profile-card">
                     <div class="profile-avatar-large" id="profileAvatarLarge">?</div>
                     <div class="profile-info">
@@ -320,7 +329,7 @@
                     </button>
                     <button class="profile-menu-item" id="menuOpenRules">
                         <span class="material-symbols-outlined">verified_user</span>
-                        <span>Правила сообщества</span>
+                        <span>Правила для 9В и 9А</span>
                     </button>
                     <button class="profile-menu-item" id="menuSuperAdmin" style="display: none;">
                         <span class="material-symbols-outlined">admin_panel_settings</span>
