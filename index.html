@@ -149,41 +149,41 @@
                 <div class="sheet-top">
                     <div class="sheet-heading">
                         <span class="material-symbols-outlined sheet-icon brand-color">verified_user</span>
-                        <h2 class="sheet-title">Правила сообщества</h2>
+                        <h2 class="sheet-title">Правила для 9В и 9А</h2>
                     </div>
                 </div>
-                <p class="sheet-subtitle">Добро пожаловать в закрытый портал 9В и 9А. Для продолжения подтвердите согласие с правилами:</p>
+                <p class="sheet-subtitle">Базовые правила нашего портала. Отметь всё, чтобы продолжить:</p>
 
-                <div class="rules-checklist">
-                    <label class="rule-checkbox-card">
+                <div class="rules-checklist" id="rulesChecklist">
+                    <label class="rule-checkbox-card" id="cardRule1">
                         <input type="checkbox" id="rule1" class="m3-checkbox">
                         <div class="rule-text">
-                            <strong>1. Уважение и вежливость</strong>
-                            <span>Общаемся без мата, оскорблений, травли и токсичности в комментариях.</span>
+                            <strong>1. Без спама и срачей <span class="required-star">*</span></strong>
+                            <span>Уважаем друг друга в комментах, без мата, оскорблений и токсика.</span>
                         </div>
                     </label>
 
-                    <label class="rule-checkbox-card">
+                    <label class="rule-checkbox-card" id="cardRule2">
                         <input type="checkbox" id="rule2" class="m3-checkbox">
                         <div class="rule-text">
-                            <strong>2. Достоверность заданий</strong>
-                            <span>Публикуем только реальные домашние задания, параграфы и проверенные ссылки.</span>
+                            <strong>2. Реальная домашка <span class="required-star">*</span></strong>
+                            <span>Пишем только настоящие номера и параграфы. Без приколов и дезы.</span>
                         </div>
                     </label>
 
-                    <label class="rule-checkbox-card">
+                    <label class="rule-checkbox-card" id="cardRule3">
                         <input type="checkbox" id="rule3" class="m3-checkbox">
                         <div class="rule-text">
-                            <strong>3. Конфиденциальность</strong>
-                            <span>Одноразовые инвайт-коды и аккаунты предназначены строго для учеников нашего класса. Запрещено передавать их третьим лицам.</span>
+                            <strong>3. Инвайты не сливать <span class="required-star">*</span></strong>
+                            <span>Коды строго для своих из 9В и 9А. Слил левым — бан аккаунта.</span>
                         </div>
                     </label>
                 </div>
 
                 <div class="sheet-actions">
-                    <button type="button" class="btn btn-filled" id="acceptRulesBtn" disabled>
+                    <button type="button" class="btn btn-filled" id="acceptRulesBtn">
                         <span class="material-symbols-outlined">check</span>
-                        <span>Принять правила и продолжить</span>
+                        <span>Принять и войти</span>
                     </button>
                 </div>
             </div>
@@ -240,23 +240,23 @@
                         <label class="form-label" for="regFullName">Имя и Фамилия</label>
                         <div class="m3-input-box">
                             <span class="material-symbols-outlined input-leading-icon">badge</span>
-                            <input type="text" id="regFullName" placeholder="Как вас зовут (для комментариев)" required>
+                            <input type="text" id="regFullName" placeholder="Иван Иванов" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="regUsername">Придумайте логин</label>
+                        <label class="form-label" for="regUsername">Логин</label>
                         <div class="m3-input-box">
                             <span class="material-symbols-outlined input-leading-icon">person</span>
-                            <input type="text" id="regUsername" placeholder="Только буквы и цифры" required autocomplete="username">
+                            <input type="text" id="regUsername" placeholder="Придумай логин" required autocomplete="username">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="regPassword">Придумайте пароль</label>
+                        <label class="form-label" for="regPassword">Пароль</label>
                         <div class="m3-input-box">
                             <span class="material-symbols-outlined input-leading-icon">key</span>
-                            <input type="password" id="regPassword" placeholder="Минимум 4 символа" required autocomplete="new-password">
+                            <input type="password" id="regPassword" placeholder="Пароль для входа" required autocomplete="new-password">
                         </div>
                     </div>
 
@@ -272,9 +272,9 @@
                         <label class="form-label" for="regInviteCode">Одноразовый инвайт-код</label>
                         <div class="m3-input-box invite-box">
                             <span class="material-symbols-outlined input-leading-icon">confirmation_number</span>
-                            <input type="text" id="regInviteCode" placeholder="Например: 9V-XXXX-X" required style="text-transform: uppercase;">
+                            <input type="text" id="regInviteCode" placeholder="9V-XXXXX" required style="text-transform: uppercase;">
                         </div>
-                        <span class="field-hint">Код выдается главным админом индивидуально каждому ученику.</span>
+                        <span class="field-hint">Инвайт выдаёт староста или главный админ.</span>
                     </div>
 
                     <div class="sheet-actions">
@@ -293,7 +293,7 @@
                         <span class="material-symbols-outlined">visibility</span>
                         <span>Войти как гость (Демо-режим)</span>
                     </button>
-                    <p class="guest-hint">В демо-режиме можно смотреть задания 9В и 9А без возможности комментировать.</p>
+                    <p class="guest-hint">Демо-просмотр заданий 9В и 9А без возможности комментировать.</p>
                 </div>
             </div>
         </div>
