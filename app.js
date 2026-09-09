@@ -1,5 +1,5 @@
 // ==========================================================================
-// GOOGLE MATERIAL YOU (M3) STUDENT HOMEWORK HUB
+// GOOGLE MATERIAL YOU (M3) SCHOOL HOMEWORK HUB
 // Accounts, One-Time Invite Codes & Rules Checklist
 // ==========================================================================
 
