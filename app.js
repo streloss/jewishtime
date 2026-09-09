@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 // GOOGLE MATERIAL YOU (M3) STUDENT HOMEWORK HUB • 9В & 9А
 // Accounts, One-Time Invite Codes, Multi-Class & Rules Checklist
 // ==========================================================================
@@ -43,10 +43,15 @@ try {
 
 // 2. DEFAULT SEED DATA
 const SEED_INVITE_CODES = [
+    { code: "9V-8K4M2", classId: "9v", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
+    { code: "9V-5R7P9", classId: "9v", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
     { code: "9V-TEST-1", classId: "9v", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
     { code: "9V-TEST-2", classId: "9v", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
+    { code: "ADM-9V-3X9L", classId: "9v", role: "class_admin", used: false, usedBy: "", createdAt: new Date().toISOString() },
     { code: "9V-STAROSTA", classId: "9v", role: "class_admin", used: false, usedBy: "", createdAt: new Date().toISOString() },
+    { code: "9A-4W8N1", classId: "9a", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
     { code: "9A-TEST-1", classId: "9a", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
+    { code: "ADM-9A-6B2Q", classId: "9a", role: "class_admin", used: false, usedBy: "", createdAt: new Date().toISOString() },
     { code: "9A-STAROSTA", classId: "9a", role: "class_admin", used: false, usedBy: "", createdAt: new Date().toISOString() }
 ];
 
