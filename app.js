@@ -1,6 +1,6 @@
 // ==========================================================================
-// GOOGLE MATERIAL YOU (M3) STUDENT HOMEWORK HUB • 9В & 9А
-// Accounts, One-Time Invite Codes, Multi-Class & Rules Checklist
+// GOOGLE MATERIAL YOU (M3) STUDENT HOMEWORK HUB
+// Accounts, One-Time Invite Codes & Rules Checklist
 // ==========================================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -47,7 +47,6 @@ const SEED_POSTS = [];
 
 // STATE
 let currentUser = null;
-let currentViewClass = "9v"; // '9v' or '9a'
 let homeworkPosts = [];
 let homeworkComments = [];
 let inviteCodes = [];
@@ -56,14 +55,12 @@ let currentSubjectFilter = "all";
 let currentDateFilter = "all";
 
 // DOM ELEMENTS
-const activeClassBadge = document.getElementById("activeClassBadge");
 const headerAvatar = document.getElementById("headerAvatar");
 const profileBtn = document.getElementById("profileBtn");
 const openRulesBtn = document.getElementById("openRulesBtn");
 const themeToggleBtn = document.getElementById("themeToggleBtn");
 const themeIcon = document.getElementById("themeIcon");
 const superAdminBtn = document.getElementById("superAdminBtn");
-const superAdminClassSwitcher = document.getElementById("superAdminClassSwitcher");
 const homeworkFeedEl = document.getElementById("homeworkFeed");
 const emptyStateEl = document.getElementById("emptyState");
 const subjectChipsContainer = document.getElementById("subjectChips");
@@ -92,18 +89,13 @@ const closeAuthSheetBtn = document.getElementById("closeAuthSheetBtn");
 const authTabs = document.getElementById("authTabs");
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
-const regClassControl = document.getElementById("regClassControl");
 const guestModeSection = document.getElementById("guestModeSection");
 const guestLoginBtn = document.getElementById("guestLoginBtn");
-
-const classSwitcherLabel = document.getElementById("classSwitcherLabel");
-const classSwitcherSegments = document.getElementById("classSwitcherSegments");
 const guestBannerAuthBtn = document.getElementById("guestBannerAuthBtn");
 
 const profileModalBackdrop = document.getElementById("profileModalBackdrop");
 const profileAvatarLarge = document.getElementById("profileAvatarLarge");
 const profileNameDisplay = document.getElementById("profileNameDisplay");
-const profileClassBadge = document.getElementById("profileClassBadge");
 const profileRoleBadge = document.getElementById("profileRoleBadge");
 const menuOpenRules = document.getElementById("menuOpenRules");
 const menuSuperAdmin = document.getElementById("menuSuperAdmin");
@@ -128,7 +120,6 @@ const addModalBackdrop = document.getElementById("addModalBackdrop");
 const closeAddSheetBtn = document.getElementById("closeAddSheetBtn");
 const cancelAddSheetBtn = document.getElementById("cancelAddSheetBtn");
 const addHomeworkForm = document.getElementById("addHomeworkForm");
-const targetClassPill = document.getElementById("targetClassPill");
 const dueDateInput = document.getElementById("dueDateInput");
 
 const reportModalBackdrop = document.getElementById("reportModalBackdrop");
@@ -158,9 +149,6 @@ function initSession() {
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
-            if (currentUser.role !== "super_admin" && !currentUser.isGuest) {
-                currentViewClass = currentUser.classId || "9v";
-            }
         } catch(e) {
             currentUser = null;
         }
@@ -169,7 +157,6 @@ function initSession() {
             role: "guest",
             fullName: "Гость (Демо)",
             username: "guest",
-            classId: "9v",
             isGuest: true
         };
     }
@@ -179,9 +166,7 @@ function initSession() {
 function updateUserUI() {
     if (!currentUser) {
         headerAvatar.textContent = "?";
-        activeClassBadge.textContent = "Вход";
         superAdminBtn.style.display = "none";
-        superAdminClassSwitcher.style.display = "none";
         roleBanner.style.display = "none";
         fabAddBtn.style.display = "none";
         if (guestBannerAuthBtn) guestBannerAuthBtn.style.display = "none";
@@ -193,22 +178,17 @@ function updateUserUI() {
         headerAvatar.textContent = "Г";
         profileAvatarLarge.textContent = "Г";
         profileNameDisplay.textContent = "Гость (Демо-режим)";
-        profileClassBadge.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " (Демо)";
         profileRoleBadge.textContent = "Демо";
-        activeClassBadge.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " (Демо)";
 
         superAdminBtn.style.display = "none";
-        superAdminClassSwitcher.style.display = "flex";
-        if (classSwitcherLabel) classSwitcherLabel.textContent = "Демо-класс:";
         menuSuperAdmin.style.display = "none";
         if (menuGuestAuth) menuGuestAuth.style.display = "flex";
 
         roleBanner.style.display = "flex";
-        roleBannerText.textContent = "Демо-режим: просмотр заданий 9В и 9А без комментариев";
+        roleBannerText.textContent = "Демо-режим: просмотр заданий без комментариев";
         if (guestBannerAuthBtn) guestBannerAuthBtn.style.display = "inline-flex";
 
         fabAddBtn.style.display = "none";
-        targetClassPill.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " класс";
         return;
     }
 
@@ -219,42 +199,30 @@ function updateUserUI() {
     headerAvatar.textContent = initial;
     profileAvatarLarge.textContent = initial;
     profileNameDisplay.textContent = currentUser.fullName || currentUser.username;
-
-    const className = (currentUser.classId === "9a" ? "9А" : "9В") + " класс";
-    profileClassBadge.textContent = currentUser.role === "super_admin" ? "Все классы" : className;
     
     let roleText = "Ученик";
-    if (currentUser.role === "class_admin") roleText = "Староста";
+    if (currentUser.role === "class_admin" || currentUser.role === "admin") roleText = "Администратор";
     if (currentUser.role === "super_admin") roleText = "Главный Админ";
     profileRoleBadge.textContent = roleText;
 
     if (currentUser.role === "super_admin") {
-        activeClassBadge.textContent = currentViewClass === "9a" ? "9А" : "9В";
         superAdminBtn.style.display = "flex";
-        superAdminClassSwitcher.style.display = "flex";
-        if (classSwitcherLabel) classSwitcherLabel.textContent = "Просмотр класса:";
         menuSuperAdmin.style.display = "flex";
         roleBanner.style.display = "flex";
-        roleBannerText.textContent = `Главный Админ (просмотр ${currentViewClass.toUpperCase()})`;
+        roleBannerText.textContent = "Главный Админ";
         fabAddBtn.style.display = "inline-flex";
-    } else if (currentUser.role === "class_admin") {
-        activeClassBadge.textContent = currentUser.classId === "9a" ? "9А" : "9В";
+    } else if (currentUser.role === "class_admin" || currentUser.role === "admin") {
         superAdminBtn.style.display = "none";
-        superAdminClassSwitcher.style.display = "none";
         menuSuperAdmin.style.display = "none";
         roleBanner.style.display = "flex";
-        roleBannerText.textContent = `Режим старосты (${currentUser.classId.toUpperCase()})`;
+        roleBannerText.textContent = "Режим администратора";
         fabAddBtn.style.display = "inline-flex";
     } else {
-        activeClassBadge.textContent = currentUser.classId === "9a" ? "9А" : "9В";
         superAdminBtn.style.display = "none";
-        superAdminClassSwitcher.style.display = "none";
         menuSuperAdmin.style.display = "none";
         roleBanner.style.display = "none";
         fabAddBtn.style.display = "none";
     }
-
-    targetClassPill.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " класс";
 }
 
 // 5. MASTER SEQUENCE FLOW (Auth First -> Rules Second)
@@ -416,16 +384,6 @@ function initFilters() {
         currentDateFilter = btn.dataset.dateFilter;
         renderFeed();
     });
-
-    superAdminClassSwitcher.addEventListener("click", (e) => {
-        const btn = e.target.closest(".segment-btn");
-        if (!btn) return;
-        document.querySelectorAll("#superAdminClassSwitcher .segment-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentViewClass = btn.dataset.adminClass;
-        updateUserUI();
-        renderFeed();
-    });
 }
 
 // 8. FIREBASE SYNC & LOCAL CACHE
@@ -524,19 +482,14 @@ function showStatus(text) {
         statusPill.style.display = "inline-flex";
     }
 }
-// 9. RENDER FEED (Filtered by classId)
+// 9. RENDER FEED
 function renderFeed() {
     homeworkFeedEl.innerHTML = "";
 
     const todayStr = getRelativeDate(0);
     const tomorrowStr = getRelativeDate(1);
 
-    const classFiltered = homeworkPosts.filter(p => {
-        if (p.classId) return p.classId === currentViewClass;
-        return currentViewClass === "9v";
-    });
-
-    const filtered = classFiltered.filter(post => {
+    const filtered = homeworkPosts.filter(post => {
         if (currentSubjectFilter !== "all" && post.subject !== currentSubjectFilter) {
             return false;
         }
@@ -598,7 +551,8 @@ function createPostCard(post, todayStr, tomorrowStr) {
     let deleteHtml = "";
     const canDelete = currentUser && (
         currentUser.role === "super_admin" || 
-        (currentUser.role === "class_admin" && currentUser.classId === post.classId)
+        currentUser.role === "class_admin" ||
+        currentUser.role === "admin"
     );
     if (canDelete) {
         deleteHtml = `
@@ -613,10 +567,7 @@ function createPostCard(post, todayStr, tomorrowStr) {
 
     card.innerHTML = `
         <div class="card-top">
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span class="subject-badge">${escapeHtml(post.subject)}</span>
-                <span class="class-pill-badge" style="font-size: 11px;">${(post.classId || '9v').toUpperCase()}</span>
-            </div>
+            <span class="subject-badge">${escapeHtml(post.subject)}</span>
             <span class="due-date-badge ${isUrgent ? 'urgent' : ''}">
                 <span class="material-symbols-outlined">calendar_today</span>
                 <span>${dateLabel}</span>
@@ -736,15 +687,12 @@ function renderCommentsHtml(comments) {
             } catch(e) {}
         }
 
-        const classBadge = c.authorClass ? `<span class="class-pill-badge" style="font-size: 10px; padding: 1px 6px;">${c.authorClass.toUpperCase()}</span>` : "";
-
         return `
             <div class="comment-bubble">
                 <div class="comment-meta">
                     <div class="comment-author-badge">
                         <div class="comment-avatar">${escapeHtml(initial)}</div>
                         <span class="comment-author-name">${escapeHtml(c.authorName)}</span>
-                        ${classBadge}
                         <span class="comment-time">${timeStr}</span>
                     </div>
                     <button class="comment-report-btn" data-comment-id="${c.id}" title="Пожаловаться">
@@ -768,7 +716,6 @@ async function addComment(postId, text) {
     const newComment = {
         postId: postId,
         authorName: currentUser.fullName || currentUser.username,
-        authorClass: currentUser.classId || currentViewClass,
         authorRole: currentUser.role,
         text: text,
         createdAt: new Date().toISOString()
@@ -793,16 +740,13 @@ async function addComment(postId, text) {
 
 // 11. ACTIONS: ADD HOMEWORK POST
 async function addHomeworkPost(subject, dueDate, task, link) {
-    const targetClass = currentViewClass;
-
     const newPost = {
-        classId: targetClass,
         subject: subject,
         dueDate: dueDate,
         task: task,
         link: link || "",
         linkTitle: link ? getDomainFromUrl(link) : "",
-        authorName: currentUser ? (currentUser.fullName || currentUser.username) : "Староста",
+        authorName: currentUser ? (currentUser.fullName || currentUser.username) : "Администратор",
         createdAt: new Date().toISOString()
     };
 
@@ -812,7 +756,7 @@ async function addHomeworkPost(subject, dueDate, task, link) {
                 ...newPost,
                 createdAt: serverTimestamp()
             });
-            showSnackbar(`Задание для ${targetClass.toUpperCase()} опубликовано!`);
+            showSnackbar("Задание опубликовано!");
             closeAddModal();
             return;
         } catch(e) {}
@@ -821,7 +765,7 @@ async function addHomeworkPost(subject, dueDate, task, link) {
     newPost.id = "post-" + Date.now();
     homeworkPosts.unshift(newPost);
     renderFeed();
-    showSnackbar(`Задание для ${targetClass.toUpperCase()} сохранено`);
+    showSnackbar("Задание сохранено");
     closeAddModal();
 }
 
@@ -849,7 +793,6 @@ async function submitReport(targetType, targetId, reason) {
         targetId: targetId,
         reason: reason,
         reportedBy: currentUser ? (currentUser.fullName || currentUser.username) : "Гость",
-        classId: currentViewClass,
         createdAt: new Date().toISOString()
     };
 
@@ -866,8 +809,8 @@ async function submitReport(targetType, targetId, reason) {
     showSnackbar("Жалоба отправлена администраторам");
 }
 // 14. SUPER ADMIN: GENERATE ONE-TIME INVITE CODES
-function generateOneTimeCode(classId, role) {
-    const prefix = role === "class_admin" ? `ADM-${classId.toUpperCase()}` : classId.toUpperCase();
+function generateOneTimeCode(role) {
+    const prefix = (role === "class_admin" || role === "admin") ? "ADM" : "HUB";
     const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
     let randomPart = "";
     for (let i = 0; i < 5; i++) {
@@ -877,18 +820,11 @@ function generateOneTimeCode(classId, role) {
 }
 
 async function handleGenerateCodeSubmit(typeKey) {
-    let classId = "9v";
-    let role = "student";
+    let role = (typeKey === "admin" || typeKey === "class_admin") ? "class_admin" : "student";
 
-    if (typeKey === "9v_student") { classId = "9v"; role = "student"; }
-    else if (typeKey === "9a_student") { classId = "9a"; role = "student"; }
-    else if (typeKey === "9v_admin") { classId = "9v"; role = "class_admin"; }
-    else if (typeKey === "9a_admin") { classId = "9a"; role = "class_admin"; }
-
-    const codeStr = generateOneTimeCode(classId, role);
+    const codeStr = generateOneTimeCode(role);
     const newCodeItem = {
         code: codeStr,
-        classId: classId,
         role: role,
         used: false,
         usedBy: "",
@@ -923,14 +859,13 @@ function renderAdminCodesList() {
     adminCodesList.innerHTML = inviteCodes.map(item => {
         const statusClass = item.used ? "used" : "free";
         const statusText = item.used ? `Использован: ${escapeHtml(item.usedBy || 'кем-то')}` : "Свободен (одноразовый)";
-        const roleLabel = item.role === "class_admin" ? "Староста" : "Ученик";
-        const classLabel = (item.classId || "9v").toUpperCase();
+        const roleLabel = (item.role === "class_admin" || item.role === "admin") ? "Администратор" : "Ученик";
 
         return `
             <div class="code-item-card">
                 <div class="code-item-left">
                     <span class="code-item-code">${escapeHtml(item.code)}</span>
-                    <span class="code-item-info">${roleLabel} • ${classLabel}</span>
+                    <span class="code-item-info">${roleLabel}</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="code-status-pill ${statusClass}">${statusText}</span>
@@ -965,7 +900,7 @@ function renderAdminReportsList() {
             <div class="code-item-card">
                 <div class="code-item-left">
                     <span style="font-weight: 700; color: var(--md-sys-color-error);">${escapeHtml(rep.reason)}</span>
-                    <span class="code-item-info">От: ${escapeHtml(rep.reportedBy || 'Ученик')} • Класс: ${(rep.classId || '9V').toUpperCase()}</span>
+                    <span class="code-item-info">От: ${escapeHtml(rep.reportedBy || 'Ученик')}</span>
                 </div>
             </div>
         `;
@@ -973,7 +908,7 @@ function renderAdminReportsList() {
 }
 
 // 15. REGISTRATION & LOGIN HANDLING
-async function handleRegister(fullName, username, password, chosenClass, enteredCode) {
+async function handleRegister(fullName, username, password, enteredCode) {
     const rawCode = (enteredCode || "").trim();
     const cleanCode = rawCode.toLowerCase();
 
@@ -986,7 +921,6 @@ async function handleRegister(fullName, username, password, chosenClass, entered
         const adminUser = {
             username: username || "admin",
             fullName: fullName || "Главный Администратор",
-            classId: chosenClass || "9v",
             role: "super_admin",
             createdAt: new Date().toISOString()
         };
@@ -1024,11 +958,6 @@ async function handleRegister(fullName, username, password, chosenClass, entered
         return;
     }
 
-    if (matchedCodeItem.classId && matchedCodeItem.classId !== chosenClass) {
-        showSnackbar(`Этот код предназначен для класса ${matchedCodeItem.classId.toUpperCase()}!`);
-        return;
-    }
-
     matchedCodeItem.used = true;
     matchedCodeItem.usedBy = fullName;
     matchedCodeItem.usedAt = new Date().toISOString();
@@ -1054,7 +983,6 @@ async function handleRegister(fullName, username, password, chosenClass, entered
         username: username,
         password: password,
         fullName: fullName,
-        classId: chosenClass,
         role: matchedCodeItem.role || "student",
         createdAt: new Date().toISOString()
     };
@@ -1069,7 +997,7 @@ async function handleRegister(fullName, username, password, chosenClass, entered
     }
 
     saveUserSession(newUser);
-    showSnackbar(`Добро пожаловать в ${chosenClass.toUpperCase()}, ${fullName}!`);
+    showSnackbar(`Добро пожаловать, ${fullName}!`);
     closeAuthModal();
 }
 
@@ -1087,7 +1015,6 @@ async function handleLogin(username, password) {
         const superAdmin = {
             username: username || "admin",
             fullName: "Главный Администратор",
-            classId: "9v",
             role: "super_admin",
             createdAt: new Date().toISOString()
         };
@@ -1124,7 +1051,6 @@ async function handleLogin(username, password) {
 
 function saveUserSession(user) {
     currentUser = user;
-    currentViewClass = user.classId || "9v";
     localStorage.setItem("student_auth_user", JSON.stringify(user));
     localStorage.removeItem("student_guest_mode");
     
@@ -1152,10 +1078,8 @@ function handleGuestLogin() {
         role: "guest",
         fullName: "Гость (Демо)",
         username: "guest",
-        classId: "9v",
         isGuest: true
     };
-    currentViewClass = "9v";
     closeAuthModal();
     updateUserUI();
     renderFeed();
@@ -1254,13 +1178,6 @@ function initModals() {
         }
     });
 
-    regClassControl.addEventListener("click", (e) => {
-        const btn = e.target.closest(".segment-btn");
-        if (!btn) return;
-        document.querySelectorAll("#regClassControl .segment-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-    });
-
     loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const u = document.getElementById("loginUsername").value.trim();
@@ -1273,18 +1190,15 @@ function initModals() {
         const fn = document.getElementById("regFullName").value.trim();
         const u = document.getElementById("regUsername").value.trim();
         const p = document.getElementById("regPassword").value.trim();
-        const activeClassBtn = document.querySelector("#regClassControl .segment-btn.active");
-        const chosenClass = activeClassBtn ? activeClassBtn.dataset.regClass : "9v";
         const code = document.getElementById("regInviteCode").value.trim();
 
         if (fn && u && p && code) {
-            handleRegister(fn, u, p, chosenClass, code);
+            handleRegister(fn, u, p, code);
         }
     });
 
     logoutBtn.addEventListener("click", () => {
         currentUser = null;
-        currentViewClass = "9v";
         localStorage.removeItem("student_auth_user");
         localStorage.removeItem("student_guest_mode");
         closeProfileModal();
@@ -1402,7 +1316,6 @@ function closeSuperAdminModal() {
 }
 
 function openAddModal() {
-    targetClassPill.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " класс";
     addModalBackdrop.classList.add("open");
     document.body.style.overflow = "hidden";
 }
