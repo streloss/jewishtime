@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -54,10 +54,10 @@
                 </div>
             </div>
 
-            <!-- Super Admin Class Switcher Bar (Only for Super Admin) -->
+            <!-- Class Switcher Bar (For Super Admin and Guest Demo Mode) -->
             <div class="admin-class-switcher" id="superAdminClassSwitcher" style="display: none;">
-                <span class="switcher-label">Просмотр класса:</span>
-                <div class="segmented-control small">
+                <span class="switcher-label" id="classSwitcherLabel">Просмотр класса:</span>
+                <div class="segmented-control small" id="classSwitcherSegments">
                     <button class="segment-btn active" data-admin-class="9v">9В класс</button>
                     <button class="segment-btn" data-admin-class="9a">9А класс</button>
                 </div>
@@ -97,12 +97,13 @@
 
         <!-- Main Feed -->
         <main class="feed-main">
-            <!-- Role Banner (Starosta / Super Admin) -->
+            <!-- Role Banner (Starosta / Super Admin / Guest Demo) -->
             <div class="author-banner" id="roleBanner" style="display: none;">
                 <div class="author-banner-content">
                     <span class="material-symbols-outlined" id="roleBannerIcon">shield</span>
                     <span id="roleBannerText">Режим старосты</span>
                 </div>
+                <button type="button" class="banner-action-btn" id="guestBannerAuthBtn" style="display: none;">Ввести код</button>
             </div>
 
             <!-- Connection Status Pill -->
@@ -282,6 +283,18 @@
                         </button>
                     </div>
                 </form>
+
+                <!-- GUEST DEMO MODE SECTION -->
+                <div class="guest-mode-section" id="guestModeSection">
+                    <div class="auth-divider">
+                        <span>или</span>
+                    </div>
+                    <button type="button" class="btn btn-tonal full-width" id="guestLoginBtn">
+                        <span class="material-symbols-outlined">visibility</span>
+                        <span>Войти как гость (Демо-режим)</span>
+                    </button>
+                    <p class="guest-hint">В демо-режиме можно смотреть задания 9В и 9А без возможности комментировать.</p>
+                </div>
             </div>
         </div>
 
@@ -301,6 +314,10 @@
                 </div>
 
                 <div class="profile-menu-list">
+                    <button class="profile-menu-item" id="menuGuestAuth" style="display: none;">
+                        <span class="material-symbols-outlined">key</span>
+                        <span>Ввести инвайт-код / Войти</span>
+                    </button>
                     <button class="profile-menu-item" id="menuOpenRules">
                         <span class="material-symbols-outlined">verified_user</span>
                         <span>Правила сообщества</span>
