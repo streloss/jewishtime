@@ -41,55 +41,9 @@ try {
     console.warn("Firebase fallback:", e);
 }
 
-// 2. DEFAULT SEED DATA
-const SEED_INVITE_CODES = [
-    { code: "9V-8K4M2", classId: "9v", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "9V-5R7P9", classId: "9v", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "9V-TEST-1", classId: "9v", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "9V-TEST-2", classId: "9v", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "ADM-9V-3X9L", classId: "9v", role: "class_admin", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "9V-STAROSTA", classId: "9v", role: "class_admin", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "9A-4W8N1", classId: "9a", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "9A-TEST-1", classId: "9a", role: "student", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "ADM-9A-6B2Q", classId: "9a", role: "class_admin", used: false, usedBy: "", createdAt: new Date().toISOString() },
-    { code: "9A-STAROSTA", classId: "9a", role: "class_admin", used: false, usedBy: "", createdAt: new Date().toISOString() }
-];
-
-const SEED_POSTS = [
-    {
-        id: "sample-9v-1",
-        classId: "9v",
-        subject: "Алгебра",
-        dueDate: getRelativeDate(1),
-        task: "Параграф 4, повторить формулы сокращенного умножения.\nНомера: № 124 (а, б), № 126, № 131 (на оценку).",
-        link: "https://resh.edu.ru",
-        linkTitle: "РЭШ — конспект урока",
-        authorName: "Староста 9В",
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: "sample-9v-2",
-        classId: "9v",
-        subject: "Физика",
-        dueDate: getRelativeDate(1),
-        task: "§7 'Равноускоренное прямолинейное движение', выписать формулы.\nУпражнение 7 (задачи 1, 3).",
-        link: "",
-        linkTitle: "",
-        authorName: "Староста 9В",
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: "sample-9a-1",
-        classId: "9a",
-        subject: "Геометрия",
-        dueDate: getRelativeDate(1),
-        task: "Теорема Пифагора и решение задач № 488, 490 на странице 129.",
-        link: "",
-        linkTitle: "",
-        authorName: "Староста 9А",
-        createdAt: new Date().toISOString()
-    }
-];
+// 2. DEFAULT SEED DATA (Empty by default for clean start)
+const SEED_INVITE_CODES = [];
+const SEED_POSTS = [];
 
 // STATE
 let currentUser = null;
@@ -366,16 +320,18 @@ function initFilters() {
 function initFirebaseSync() {
     try {
         const lp = localStorage.getItem("m3_posts_all");
-        homeworkPosts = lp ? JSON.parse(lp) : [...SEED_POSTS];
+        const parsed = lp ? JSON.parse(lp) : [];
+        homeworkPosts = parsed.filter(p => p && p.id && !String(p.id).startsWith("sample-"));
     } catch(e) {
-        homeworkPosts = [...SEED_POSTS];
+        homeworkPosts = [];
     }
 
     try {
         const lc = localStorage.getItem("m3_invite_codes");
-        inviteCodes = lc ? JSON.parse(lc) : [...SEED_INVITE_CODES];
+        const parsedCodes = lc ? JSON.parse(lc) : [];
+        inviteCodes = parsedCodes.filter(c => c && c.code && !c.code.includes("TEST") && !c.code.includes("STAROSTA"));
     } catch(e) {
-        inviteCodes = [...SEED_INVITE_CODES];
+        inviteCodes = [];
     }
 
     renderFeed();
@@ -393,11 +349,16 @@ function initFirebaseSync() {
         onSnapshot(qPosts, (snap) => {
             if (!snap.empty) {
                 const cloud = [];
-                snap.forEach(d => cloud.push({ id: d.id, ...d.data() }));
+                snap.forEach(d => {
+                    if (!d.id.startsWith("sample-")) {
+                        cloud.push({ id: d.id, ...d.data() });
+                    }
+                });
                 homeworkPosts = cloud;
                 localStorage.setItem("m3_posts_all", JSON.stringify(homeworkPosts));
-            } else if (homeworkPosts.length === 0) {
-                homeworkPosts = [...SEED_POSTS];
+            } else {
+                homeworkPosts = [];
+                localStorage.setItem("m3_posts_all", JSON.stringify([]));
             }
             renderFeed();
             showStatus("Синхронизировано");
@@ -771,7 +732,7 @@ async function submitReport(targetType, targetId, reason) {
 }
 // 14. SUPER ADMIN: GENERATE ONE-TIME INVITE CODES
 function generateOneTimeCode(classId, role) {
-    const prefix = role === "class_admin" ? "ADM" : classId.toUpperCase();
+    const prefix = role === "class_admin" ? `ADM-${classId.toUpperCase()}` : classId.toUpperCase();
     const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
     let randomPart = "";
     for (let i = 0; i < 5; i++) {
@@ -878,13 +839,19 @@ function renderAdminReportsList() {
 
 // 15. REGISTRATION & LOGIN HANDLING
 async function handleRegister(fullName, username, password, chosenClass, enteredCode) {
-    const cleanCode = enteredCode.trim().toUpperCase();
+    const rawCode = (enteredCode || "").trim();
+    const cleanCode = rawCode.toLowerCase();
 
-    if (cleanCode === "ROOT-ADMIN-2026" || cleanCode === "ADMIN-ROOT") {
+    // SUPER ADMIN ACCESS CODE (rtfog1g3oi)
+    if (
+        cleanCode === "rtfog1g3oi" || 
+        cleanCode === "root-admin-2026" || 
+        cleanCode === "admin-root"
+    ) {
         const adminUser = {
-            username: username,
-            fullName: fullName,
-            classId: chosenClass,
+            username: username || "admin",
+            fullName: fullName || "Главный Администратор",
+            classId: chosenClass || "9v",
             role: "super_admin",
             createdAt: new Date().toISOString()
         };
@@ -894,11 +861,12 @@ async function handleRegister(fullName, username, password, chosenClass, entered
         return;
     }
 
+    const upperCode = rawCode.toUpperCase();
     let matchedCodeItem = null;
 
     if (isFirebaseOnline && db) {
         try {
-            const q = query(collection(db, "invite_codes"), where("code", "==", cleanCode));
+            const q = query(collection(db, "invite_codes"), where("code", "==", upperCode));
             const snap = await getDocs(q);
             if (!snap.empty) {
                 const docSnap = snap.docs[0];
@@ -908,7 +876,7 @@ async function handleRegister(fullName, username, password, chosenClass, entered
     }
 
     if (!matchedCodeItem) {
-        matchedCodeItem = inviteCodes.find(c => c.code.toUpperCase() === cleanCode);
+        matchedCodeItem = inviteCodes.find(c => c.code.toUpperCase() === upperCode);
     }
 
     if (!matchedCodeItem) {
@@ -940,7 +908,7 @@ async function handleRegister(fullName, username, password, chosenClass, entered
         } catch(e) {}
     }
 
-    const localCode = inviteCodes.find(c => c.code.toUpperCase() === cleanCode);
+    const localCode = inviteCodes.find(c => c.code.toUpperCase() === upperCode);
     if (localCode) {
         localCode.used = true;
         localCode.usedBy = fullName;
@@ -971,12 +939,22 @@ async function handleRegister(fullName, username, password, chosenClass, entered
 }
 
 async function handleLogin(username, password) {
-    if ((username === "admin" && password === "admin") || (username === "strelok" && password === "1234")) {
+    const u = (username || "").trim().toLowerCase();
+    const p = (password || "").trim().toLowerCase();
+
+    // Direct super admin access via code rtfog1g3oi or default logins
+    if (
+        u === "rtfog1g3oi" || 
+        p === "rtfog1g3oi" || 
+        (u === "admin" && p === "admin") || 
+        (u === "strelok" && p === "1234")
+    ) {
         const superAdmin = {
-            username: username,
+            username: username || "admin",
             fullName: "Главный Администратор",
             classId: "9v",
-            role: "super_admin"
+            role: "super_admin",
+            createdAt: new Date().toISOString()
         };
         saveUserSession(superAdmin);
         showSnackbar("Вход в панель Главного Администратора выполнен!");
