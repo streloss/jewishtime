@@ -1210,6 +1210,31 @@ function initModals() {
         }
     });
 
+    const closeProfileSheetBtn = document.getElementById("closeProfileSheetBtn");
+    if (closeProfileSheetBtn) {
+        closeProfileSheetBtn.addEventListener("click", closeProfileModal);
+    }
+
+    profileModalBackdrop.addEventListener("click", (e) => {
+        if (e.target === profileModalBackdrop) closeProfileModal();
+    });
+
+    const profileDragHandle = document.getElementById("profileDragHandle");
+    if (profileDragHandle) {
+        profileDragHandle.addEventListener("click", closeProfileModal);
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            if (profileModalBackdrop.classList.contains("open")) closeProfileModal();
+            if (superAdminModalBackdrop.classList.contains("open")) closeSuperAdminModal();
+            if (addModalBackdrop.classList.contains("open")) closeAddModal();
+            if (reportModalBackdrop.classList.contains("open")) closeReportModal();
+            if (authModalBackdrop.classList.contains("open") && authModalBackdrop.dataset.mandatory !== "true") closeAuthModal();
+            if (rulesModalBackdrop.classList.contains("open") && rulesModalBackdrop.dataset.mandatory !== "true") closeRulesModal();
+        }
+    });
+
     authTabs.addEventListener("click", (e) => {
         const btn = e.target.closest(".segment-btn");
         if (!btn) return;
