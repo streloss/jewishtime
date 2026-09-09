@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Домашние задания • 9В и 9А</title>
+    <title>Домашние задания • Студенческий хаб</title>
 
     <!-- Google Fonts & Material Symbols (Google Material You M3) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,8 +30,6 @@
                     </div>
                     <!-- Beta Badge -->
                     <span class="beta-badge" title="Платформа находится в стадии бета-тестирования">бета • v0.9</span>
-                    <!-- Active Class Badge -->
-                    <span class="class-pill-badge" id="activeClassBadge">9В</span>
                 </div>
 
                 <div class="app-bar-actions">
@@ -51,15 +49,6 @@
                     <button class="profile-btn" id="profileBtn" aria-label="Профиль пользователя" title="Профиль">
                         <div class="profile-avatar" id="headerAvatar">?</div>
                     </button>
-                </div>
-            </div>
-
-            <!-- Class Switcher Bar (For Super Admin and Guest Demo Mode) -->
-            <div class="admin-class-switcher" id="superAdminClassSwitcher" style="display: none;">
-                <span class="switcher-label" id="classSwitcherLabel">Просмотр класса:</span>
-                <div class="segmented-control small" id="classSwitcherSegments">
-                    <button class="segment-btn active" data-admin-class="9v">9В класс</button>
-                    <button class="segment-btn" data-admin-class="9a">9А класс</button>
                 </div>
             </div>
 
@@ -149,7 +138,7 @@
                 <div class="sheet-top">
                     <div class="sheet-heading">
                         <span class="material-symbols-outlined sheet-icon brand-color">verified_user</span>
-                        <h2 class="sheet-title">Правила для 9В и 9А</h2>
+                        <h2 class="sheet-title">Правила сообщества</h2>
                     </div>
                 </div>
                 <p class="sheet-subtitle">Базовые правила нашего портала. Отметь всё, чтобы продолжить:</p>
@@ -175,7 +164,7 @@
                         <input type="checkbox" id="rule3" class="m3-checkbox">
                         <div class="rule-text">
                             <strong>3. Инвайты не сливать <span class="required-star">*</span></strong>
-                            <span>Коды строго для своих из 9В и 9А. Слил левым — бан аккаунта.</span>
+                            <span>Одноразовый код строго твой. Посторонним не давать. Слил — бан аккаунта.</span>
                         </div>
                     </label>
                 </div>
@@ -261,20 +250,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Ваш класс</label>
-                        <div class="segmented-control" id="regClassControl">
-                            <button type="button" class="segment-btn active" data-reg-class="9v">9В класс</button>
-                            <button type="button" class="segment-btn" data-reg-class="9a">9А класс</button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
                         <label class="form-label" for="regInviteCode">Одноразовый инвайт-код</label>
                         <div class="m3-input-box invite-box">
                             <span class="material-symbols-outlined input-leading-icon">confirmation_number</span>
-                            <input type="text" id="regInviteCode" placeholder="9V-XXXXX" required style="text-transform: uppercase;">
+                            <input type="text" id="regInviteCode" placeholder="HUB-XXXXX" required style="text-transform: uppercase;">
                         </div>
-                        <span class="field-hint">Инвайт выдаёт староста или главный админ.</span>
+                        <span class="field-hint">Инвайт выдаёт администратор.</span>
                     </div>
 
                     <div class="sheet-actions">
@@ -293,7 +274,7 @@
                         <span class="material-symbols-outlined">visibility</span>
                         <span>Войти как гость (Демо-режим)</span>
                     </button>
-                    <p class="guest-hint">Демо-просмотр заданий 9В и 9А без возможности комментировать.</p>
+                    <p class="guest-hint">Демо-просмотр заданий без возможности комментировать.</p>
                 </div>
             </div>
         </div>
@@ -316,7 +297,6 @@
                     <div class="profile-info">
                         <h2 class="profile-name" id="profileNameDisplay">Гость</h2>
                         <div class="profile-badges">
-                            <span class="profile-class-badge" id="profileClassBadge">Класс не выбран</span>
                             <span class="profile-role-badge" id="profileRoleBadge">Ученик</span>
                         </div>
                     </div>
@@ -329,7 +309,7 @@
                     </button>
                     <button class="profile-menu-item" id="menuOpenRules">
                         <span class="material-symbols-outlined">verified_user</span>
-                        <span>Правила для 9В и 9А</span>
+                        <span>Правила сообщества</span>
                     </button>
                     <button class="profile-menu-item" id="menuSuperAdmin" style="display: none;">
                         <span class="material-symbols-outlined">admin_panel_settings</span>
@@ -372,10 +352,8 @@
                             <div class="m3-input-box select-box">
                                 <span class="material-symbols-outlined input-leading-icon">key</span>
                                 <select id="inviteRoleSelect">
-                                    <option value="9v_student">Ученик 9В</option>
-                                    <option value="9a_student">Ученик 9А</option>
-                                    <option value="9v_admin">Староста / Админ 9В</option>
-                                    <option value="9a_admin">Староста / Админ 9А</option>
+                                    <option value="student">Ученик</option>
+                                    <option value="admin">Администратор</option>
                                 </select>
                             </div>
                         </div>
@@ -389,13 +367,13 @@
                     <div class="generated-result-card" id="generatedResultCard" style="display: none;">
                         <span class="result-label">Сгенерирован новый одноразовый код:</span>
                         <div class="code-copy-row">
-                            <code class="code-value" id="generatedCodeValue">9V-XXXX-X</code>
+                            <code class="code-value" id="generatedCodeValue">HUB-XXXX-X</code>
                             <button class="btn btn-tonal copy-btn" id="copyGeneratedCodeBtn">
                                 <span class="material-symbols-outlined">content_copy</span>
                                 <span>Скопировать</span>
                             </button>
                         </div>
-                        <span class="result-hint">Отправьте этот код однокласснику в Telegram или VK. Код сгорит сразу после его активации.</span>
+                        <span class="result-hint">Отправьте этот код ученику в Telegram или VK. Код сгорит сразу после его активации.</span>
                     </div>
                 </div>
 
@@ -430,11 +408,6 @@
                 </div>
 
                 <form id="addHomeworkForm" class="sheet-form">
-                    <div class="form-group">
-                        <label class="form-label">Публикация для класса:</label>
-                        <div class="current-target-class-pill" id="targetClassPill">9В класс</div>
-                    </div>
-
                     <div class="form-group">
                         <label class="form-label" for="subjectSelect">Предмет</label>
                         <div class="m3-input-box select-box">
@@ -505,7 +478,7 @@
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
-                <p class="sheet-subtitle">Укажите причину жалобы. Сообщение будет передано старосте и главному админу:</p>
+                <p class="sheet-subtitle">Укажите причину жалобы. Сообщение будет передано администраторам:</p>
 
                 <form id="reportForm" class="sheet-form">
                     <input type="hidden" id="reportTargetType" value="">
