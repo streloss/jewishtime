@@ -1,4 +1,4 @@
-// Service Worker for Material 3 Student Homework Hub
+// Service Worker for Material 3 School Homework Hub
 const CACHE_NAME = 'homework-hub-v1.0.4';
 
 const PRECACHE_ASSETS = [
