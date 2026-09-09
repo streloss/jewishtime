@@ -1,5 +1,5 @@
 // Service Worker for Material 3 Student Homework Hub
-const CACHE_NAME = 'homework-hub-v1.0.3';
+const CACHE_NAME = 'homework-hub-v1.0.4';
 
 const PRECACHE_ASSETS = [
     './',
@@ -9,7 +9,8 @@ const PRECACHE_ASSETS = [
     './favicon.svg',
     './manifest.json',
     './icon-192.png',
-    './icon-512.png'
+    './icon-512.png',
+    './icon-maskable-512.png'
 ];
 
 // Install: Cache critical static assets
