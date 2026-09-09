@@ -9,9 +9,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Задания</title>
 
-    <!-- Favicon (Material You Book SVG) -->
+    <!-- Favicon & PWA Web App Manifest -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" href="favicon.svg">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-title" content="Задания">
+    <meta name="application-name" content="Задания">
+    <meta name="theme-color" content="#111318">
 
     <!-- Google Fonts & Material Symbols (Google Material You M3) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -319,6 +323,10 @@
                         <span class="material-symbols-outlined">admin_panel_settings</span>
                         <span>Панель Главного Админа</span>
                     </button>
+                    <button class="profile-menu-item" id="menuInstallApp">
+                        <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">install_mobile</span>
+                        <span>Установить на телефон</span>
+                    </button>
                     <button class="profile-menu-item danger-item" id="logoutBtn">
                         <span class="material-symbols-outlined">logout</span>
                         <span>Выйти из аккаунта</span>
@@ -531,6 +539,53 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- 7. PWA INSTALL MODAL (iOS & fallback instructions) -->
+        <div class="modal-backdrop" id="pwaInstallModalBackdrop">
+            <div class="bottom-sheet pwa-install-sheet" id="pwaInstallSheet">
+                <div class="sheet-drag-handle"></div>
+                <div class="sheet-top">
+                    <div class="sheet-heading">
+                        <span class="material-symbols-outlined sheet-icon brand-color">install_mobile</span>
+                        <h2 class="sheet-title">Установка на телефон</h2>
+                    </div>
+                    <button class="icon-btn" id="closePwaInstallBtn" aria-label="Закрыть">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <p class="sheet-subtitle">Добавь портал на экран «Домой», чтобы открывать в 1 клик на весь экран без браузера:</p>
+
+                <div class="pwa-steps-list">
+                    <div class="pwa-step-card">
+                        <div class="pwa-step-num">1</div>
+                        <div class="pwa-step-text">
+                            <strong>Нажми «Поделиться»</strong>
+                            <span>В меню браузера Safari нажми иконку <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">ios_share</span></span>
+                        </div>
+                    </div>
+                    <div class="pwa-step-card">
+                        <div class="pwa-step-num">2</div>
+                        <div class="pwa-step-text">
+                            <strong>Выбери «На экран „Домой“»</strong>
+                            <span>Пролистай меню и выбери пункт <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">add_box</span> «На экран Домой»</span>
+                        </div>
+                    </div>
+                    <div class="pwa-step-card">
+                        <div class="pwa-step-num">3</div>
+                        <div class="pwa-step-text">
+                            <strong>Нажми «Добавить»</strong>
+                            <span>В правом верхнем углу нажми «Добавить» — готово!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sheet-actions">
+                    <button type="button" class="btn btn-filled full-width" id="confirmPwaInstallBtn">
+                        <span>Понятно!</span>
+                    </button>
+                </div>
             </div>
         </div>
 
