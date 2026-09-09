@@ -1156,6 +1156,7 @@ function initModals() {
             if (reportModalBackdrop.classList.contains("open")) closeReportModal();
             if (authModalBackdrop.classList.contains("open") && authModalBackdrop.dataset.mandatory !== "true") closeAuthModal();
             if (rulesModalBackdrop.classList.contains("open") && rulesModalBackdrop.dataset.mandatory !== "true") closeRulesModal();
+            if (typeof closePwaInstallModal === "function") closePwaInstallModal();
         }
     });
 
@@ -1386,4 +1387,62 @@ function getDomainFromUrl(url) {
     } catch(e) {
         return "Материалы";
     }
+}
+
+// 18. PROGRESSIVE WEB APP (PWA) CONTROLLER
+let deferredInstallPrompt = null;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+});
+
+const menuInstallApp = document.getElementById("menuInstallApp");
+const pwaInstallModalBackdrop = document.getElementById("pwaInstallModalBackdrop");
+const closePwaInstallBtn = document.getElementById("closePwaInstallBtn");
+const confirmPwaInstallBtn = document.getElementById("confirmPwaInstallBtn");
+
+function closePwaInstallModal() {
+    if (pwaInstallModalBackdrop) {
+        pwaInstallModalBackdrop.classList.remove("open");
+        document.body.style.overflow = "";
+    }
+}
+
+if (menuInstallApp) {
+    menuInstallApp.addEventListener("click", async () => {
+        closeProfileModal();
+        if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            const choice = await deferredInstallPrompt.userChoice;
+            if (choice && choice.outcome === "accepted") {
+                showSnackbar("Приложение устанавливается!");
+            }
+            deferredInstallPrompt = null;
+        } else {
+            if (pwaInstallModalBackdrop) {
+                pwaInstallModalBackdrop.classList.add("open");
+                document.body.style.overflow = "hidden";
+            } else {
+                showSnackbar("Нажмите «Поделиться» и выберите «На экран Домой»");
+            }
+        }
+    });
+}
+
+if (closePwaInstallBtn) closePwaInstallBtn.addEventListener("click", closePwaInstallModal);
+if (confirmPwaInstallBtn) confirmPwaInstallBtn.addEventListener("click", closePwaInstallModal);
+if (pwaInstallModalBackdrop) {
+    pwaInstallModalBackdrop.addEventListener("click", (e) => {
+        if (e.target === pwaInstallModalBackdrop) closePwaInstallModal();
+    });
+}
+
+// Register Service Worker
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+            .then(reg => console.log("PWA Service Worker registered:", reg.scope))
+            .catch(err => console.warn("PWA Service Worker registration failed:", err));
+    });
 }
