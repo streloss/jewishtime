@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jewishtime.fun</title>
+    <style>
+        /* Базовые цвета: Светлая тема */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --border-color: #d1d5db;
+            --secondary-text: #4b5563;
+            --news-bg: #f9fafb;
+            --input-bg: #ffffff;
+            --btn-bg: #000000;
+            --btn-text: #ffffff;
+            --news-date: #9ca3af;
+            --msg-hover: #f3f4f6;
+        }
+
+        /* Автоматическая Темная тема под систему */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f141c;
+                --text-color: #f3f4f6;
+                --border-color: #2d3748;
+                --secondary-text: #9ca3af;
+                --news-bg: #171f2c;
+                --input-bg: #131b26;
+                --btn-bg: #f3f4f6;
+                --btn-text: #0f141c;
+                --news-date: #6b7280;
+                --msg-hover: #171f2c;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 1. ЭКРАН ШЛЮЗА ПРОВЕРКИ */
+        #gatewayScreen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 30px;
+        }
+
+        .center-gateway {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 36px;
+        }
+
+        .status-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .spinner-svg {
+            width: 36px;
+            height: 36px;
+            animation: rotateClockwise 1s linear infinite;
+            flex-shrink: 0;
+            color: var(--text-color);
+        }
+
+        @keyframes rotateClockwise {
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-title {
+            font-size: 26px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .check-svg {
+            width: 36px;
+            height: 36px;
+            color: var(--text-color);
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .continue-btn {
+            display: none;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border-color);
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.15s ease, opacity 0.2s ease;
+        }
+
+        .continue-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .accordion-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .accordion-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 19px;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .accordion-arrow {
+            font-size: 18px;
+            font-weight: bold;
+            display: inline-block;
+            transition: transform 0.2s ease;
+            line-height: 1;
+        }
+
+        .accordion-toggle.active .accordion-arrow {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            display: none;
+            margin-top: 14px;
+            text-align: left;
+            font-size: 14.5px;
+            line-height: 1.7;
+            padding-left: 20px;
+            color: var(--secondary-text);
+        }
+
+        .accordion-body.open {
+            display: block;
+        }
+
+        /* 2. ЭКРАН ОСНОВНОГО САЙТА */
+        #mainSite {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 18px 24px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            padding: 32px 28px;
+            gap: 36px;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Блок новостей слева */
+        .news-box {
+            width: 280px;
+            border: 1px solid var(--border-color);
+            background-color: var(--news-bg);
+            border-radius: 6px;
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-color);
+            flex-shrink: 0;
+            height: fit-content;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .news-header {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--secondary-text);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .news-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .news-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .news-desc {
+            font-size: 13.5px;
+            color: var(--secondary-text);
+            line-height: 1.45;
+        }
+
+        .news-date {
+            font-size: 11px;
+            color: var(--news-date);
+            margin-top: 2px;
+        }
+
+        /* Правая зона: Живые сообщения пользователей */
+        .messages-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--news-bg);
+            min-height: 480px;
+            max-height: 700px;
+        }
+
+        .messages-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Отдельное сообщение в ленте */
+        .msg-bubble {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: transparent;
+            transition: background-color 0.15s ease;
+        }
+
+        .msg-bubble:hover {
+            background-color: var(--msg-hover);
+        }
+
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .msg-author {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .msg-time {
+            color: var(--secondary-text);
+            font-size: 11px;
+        }
+
+        .msg-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--text-color);
+            word-break: break-word;
+        }
+
+        /* Форма отправки сообщения */
+        .messages-input-bar {
+            padding: 14px 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background-color: var(--news-bg);
+            border-radius: 0 0 6px 6px;
+        }
+
+        .input-author {
+            width: 110px;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            flex-shrink: 0;
+        }
+
+        .input-author:focus {
+            border-color: var(--text-color);
+        }
+
+        .input-text {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .input-text:focus {
+            border-color: var(--text-color);
+        }
+
+        .send-btn {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border-color);
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            opacity: 0.85;
+        }
+
+        /* Подвал */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--secondary-text);
+            padding: 24px 30px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                flex-direction: column;
+                padding: 16px;
+            }
+            .news-box {
+                width: 100%;
+            }
+            .input-author {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. ЭКРАН ШЛЮЗА ПРОВЕРКИ -->
+    <div id="gatewayScreen">
+        <div class="center-gateway">
+            <div class="status-box">
+                <svg class="spinner-svg" id="spinnerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                    <path d="M21 21v-5h-5"/>
+                </svg>
+
+                <svg class="check-svg" id="checkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+
+                <span class="status-title" id="statusLabel">проверка...</span>
+            </div>
+
+            <button class="continue-btn" id="continueBtn" onclick="enterSite()">
+                Продолжить
+            </button>
+
+            <div class="accordion-wrapper">
+                <div class="accordion-toggle" id="accToggle" onclick="toggleAcc()">
+                    <span>какие узлы недоступны?</span>
+                    <span class="accordion-arrow" id="accArrow">^</span>
+                </div>
+                <ul class="accordion-body" id="accBody">
+                    <li>Школьные сети и ЕСПД (Минпросвещения)</li>
+                    <li>Государственные сети и ведомства РФ</li>
+                    <li>Образовательные государственные сети (RUNNet, Информика)</li>
+                    <li>Все зарубежные узлы связи (вне территории РФ)</li>
+                    <li>Дата-центры, серверные хостинги, Tor и публичные VPN</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>доступ только гражданским узлам связей</div>
+            <div>powered by connect.fun</div>
+        </div>
+    </div>
+
+    <!-- 2. ЭКРАН ОСНОВНОГО САЙТА С ЖИВЫМИ СООБЩЕНИЯМИ FIREBASE -->
+    <div id="mainSite">
+        <div class="header">
+            jewishtime.fun
+        </div>
+
+        <div class="content-area">
+            <!-- Блок новостей -->
+            <div class="news-box">
+                <div class="news-header">Новости</div>
+                <div class="news-item">
+                    <div class="news-title">github проблемы</div>
+                    <div class="news-desc">
+                        У части провайдеров в РФ периодически сбоит доступ к серверам GitHub Pages и зависает проверка SSL-сертификатов. Если сайт не грузится сразу — помогает сброс кэша браузера или смена DNS на 1.1.1.1.
+                    </div>
+                    <div class="news-date">Сегодня</div>
+                </div>
+            </div>
+
+            <!-- Правая зона: Живые сообщения от пользователей -->
+            <div class="messages-area">
+                <div class="messages-feed" id="messagesFeed">
+                    <!-- Сообщения подтягиваются из Firebase в реальном времени -->
+                </div>
+
+                <!-- Строка отправки сообщения -->
+                <form class="messages-input-bar" id="msgForm" onsubmit="return false;">
+                    <input type="text" id="msgAuthor" class="input-author" placeholder="Имя" maxlength="20" autocomplete="off">
+                    <input type="text" id="msgText" class="input-text" placeholder="Написать сообщение..." maxlength="300" autocomplete="off">
+                    <button type="submit" id="sendBtn" class="send-btn">Отправить</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>доступ только гражданским узлам связей</div>
+            <div>powered by connect.fun</div>
+        </div>
+    </div>
+
+    <!-- Модуль Firebase (Firestore Realtime) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            query, 
+            orderBy, 
+            limit, 
+            onSnapshot, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Ваш боевой конфиг Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC26Ub9WV7Swfw1lje5KvQe929ufMyiJzU",
+            authDomain: "jewishtime-ae74e.firebaseapp.com",
+            projectId: "jewishtime-ae74e",
+            storageBucket: "jewishtime-ae74e.firebasestorage.app",
+            messagingSenderId: "706590234782",
+            appId: "1:706590234782:web:c7871664445396f7d8c38f",
+            measurementId: "G-1Y30EW35BR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const feedEl = document.getElementById("messagesFeed");
+        const formEl = document.getElementById("msgForm");
+        const authorInput = document.getElementById("msgAuthor");
+        const textInput = document.getElementById("msgText");
+
+        // Запоминаем имя пользователя локально
+        authorInput.value = localStorage.getItem("jt_author") || "";
+
+        // Прослушивание сообщений в реальном времени
+        const q = query(collection(db, "messages"), orderBy("createdAt", "asc"), limit(70));
+        
+        onSnapshot(q, (snapshot) => {
+            feedEl.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const bubble = document.createElement("div");
+                bubble.className = "msg-bubble";
+
+                let timeStr = "";
+                if (data.createdAt && data.createdAt.toDate) {
+                    const d = data.createdAt.toDate();
+                    timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+
+                bubble.innerHTML = `
+                    <div class="msg-meta">
+                        <span class="msg-author">${escapeHtml(data.author || "Аноним")}</span>
+                        <span class="msg-time">${timeStr}</span>
+                    </div>
+                    <div class="msg-text">${escapeHtml(data.text || "")}</div>
+                `;
+                feedEl.appendChild(bubble);
+            });
+
+            // Автопрокрутка вниз к свежим сообщениям
+            feedEl.scrollTop = feedEl.scrollHeight;
+        }, (err) => {
+            console.warn("Firestore listener:", err);
+        });
+
+        // Отправка нового сообщения
+        formEl.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const text = textInput.value.trim();
+            let author = authorInput.value.trim();
+
+            if (!text) return;
+            if (!author) author = "Аноним";
+
+            localStorage.setItem("jt_author", author);
+            textInput.value = "";
+
+            try {
+                await addDoc(collection(db, "messages"), {
+                    author: author,
+                    text: text,
+                    createdAt: serverTimestamp()
+                });
+            } catch (err) {
+                console.error("Ошибка отправки:", err);
+            }
+        });
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+
+    <!-- Скрипт проверки сети и шлюза -->
+    <script>
+        const SCHOOL_PATTERNS = ['espd', 'еспд', 'informika', 'информика', 'runnet', 'edu.ru', 'edu.gov', 'minobr', 'минобр', 'school', 'shkola', 'школ', 'lyceum', 'лицей', 'gymnasium', 'гимнази', 'college'];
+        const GOV_PATTERNS = ['gov.ru', 'gosuslugi', 'госуслуги', 'spetsvyaz', 'спецсвязь', 'fso', 'фсо', 'fsb', 'фсб', 'mvd', 'мвд', 'mil.ru', 'миноборон', 'rosgvard', 'customs', 'nalog.gov', 'roskomnadzor', 'rkn', 'grfc', 'duma', 'kremlin', 'minsvyaz', 'digital.gov', 'cbr.ru', 'sudrf', 'genproc', 'sledcom', 'mchs', 'fssp', 'fsin', 'fas.gov'];
+        const GOV_ASNS = [3326, 8342, 3267, 42610, 41668, 31200, 28723, 48434, 50466, 20764];
+
+        function toggleAcc() {
+            const toggle = document.getElementById('accToggle');
+            const body = document.getElementById('accBody');
+            toggle.classList.toggle('active');
+            body.classList.toggle('open');
+        }
+
+        function enterSite() {
+            document.getElementById('gatewayScreen').style.display = "none";
+            document.getElementById('mainSite').style.display = "flex";
+        }
+
+        async function startVerification() {
+            const label = document.getElementById('statusLabel');
+            const spinner = document.getElementById('spinnerIcon');
+            const check = document.getElementById('checkIcon');
+            const continueBtn = document.getElementById('continueBtn');
+
+            label.textContent = "проверка...";
+            await new Promise(r => setTimeout(r, 600));
+
+            label.textContent = "ждём ответ от сервиса";
+
+            try {
+                const res = await fetch('https://ipwho.is/');
+                const data = await res.json();
+
+                const countryCode = data.country_code || '';
+                const isp = (data.connection ? (data.connection.isp || data.connection.org) : '') || '';
+                const asn = (data.connection ? data.connection.asn : 0) || 0;
+                const domain = (data.connection && data.connection.domain ? data.connection.domain : '') || '';
+
+                const fullNet = `${isp.toLowerCase()} ${domain.toLowerCase()}`;
+                const isSchool = asn === 48434 || asn === 3267 || SCHOOL_PATTERNS.some(p => fullNet.includes(p));
+                const isGov = GOV_ASNS.includes(asn) || GOV_PATTERNS.some(p => fullNet.includes(p));
+
+                await new Promise(r => setTimeout(r, 500));
+
+                if (countryCode === 'RU' && !isSchool && !isGov) {
+                    spinner.style.display = "none";
+                    check.style.display = "block";
+                    label.textContent = "доступ к сайту предоставлен!";
+                    continueBtn.style.display = "inline-block";
+                } else {
+                    spinner.style.display = "none";
+                    label.textContent = "в доступе отказано: узел заблокирован";
+                }
+
+            } catch (e) {
+                spinner.style.display = "none";
+                check.style.display = "block";
+                label.textContent = "доступ к сайту предоставлен!";
+                continueBtn.style.display = "inline-block";
+            }
+        }
+
+        startVerification();
+    </script>
+</body>
+</html>
