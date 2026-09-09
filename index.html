@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Домашние задания</title>
+    <title>Домашние задания • 9В и 9А</title>
 
     <!-- Google Fonts & Material Symbols (Google Material You M3) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,17 +23,43 @@
         <!-- Top App Bar (Material 3) -->
         <header class="top-app-bar">
             <div class="app-bar-inner">
-                <div class="brand">
-                    <span class="material-symbols-outlined brand-icon">auto_stories</span>
-                    <h1 class="brand-title">Задания</h1>
+                <div class="brand-group">
+                    <div class="brand">
+                        <span class="material-symbols-outlined brand-icon">auto_stories</span>
+                        <h1 class="brand-title">Задания</h1>
+                    </div>
+                    <!-- Beta Badge -->
+                    <span class="beta-badge" title="Платформа находится в стадии бета-тестирования">бета • v0.9</span>
+                    <!-- Active Class Badge -->
+                    <span class="class-pill-badge" id="activeClassBadge">9В</span>
                 </div>
+
                 <div class="app-bar-actions">
+                    <!-- Rules Info Button -->
+                    <button class="icon-btn" id="openRulesBtn" aria-label="Правила сообщества" title="Правила сообщества">
+                        <span class="material-symbols-outlined">verified_user</span>
+                    </button>
+                    <!-- Theme Toggle -->
                     <button class="icon-btn" id="themeToggleBtn" aria-label="Сменить тему" title="Сменить тему">
                         <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
                     </button>
-                    <button class="icon-btn" id="authorModeBtn" aria-label="Режим автора" title="Вход автора">
-                        <span class="material-symbols-outlined" id="authorIcon">lock</span>
+                    <!-- Super Admin Panel Button (visible to super admin) -->
+                    <button class="icon-btn" id="superAdminBtn" style="display: none;" aria-label="Панель Главного Админа" title="Генератор кодов и управление">
+                        <span class="material-symbols-outlined">admin_panel_settings</span>
                     </button>
+                    <!-- Profile / Auth Button -->
+                    <button class="profile-btn" id="profileBtn" aria-label="Профиль пользователя" title="Профиль">
+                        <div class="profile-avatar" id="headerAvatar">?</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Super Admin Class Switcher Bar (Only for Super Admin) -->
+            <div class="admin-class-switcher" id="superAdminClassSwitcher" style="display: none;">
+                <span class="switcher-label">Просмотр класса:</span>
+                <div class="segmented-control small">
+                    <button class="segment-btn active" data-admin-class="9v">9В класс</button>
+                    <button class="segment-btn" data-admin-class="9a">9А класс</button>
                 </div>
             </div>
 
@@ -71,19 +97,18 @@
 
         <!-- Main Feed -->
         <main class="feed-main">
-            <!-- Author Mode Notice Bar -->
-            <div class="author-banner" id="authorBanner" style="display: none;">
+            <!-- Role Banner (Starosta / Super Admin) -->
+            <div class="author-banner" id="roleBanner" style="display: none;">
                 <div class="author-banner-content">
-                    <span class="material-symbols-outlined">edit_note</span>
-                    <span>Режим автора: вы можете публиковать и удалять задания</span>
+                    <span class="material-symbols-outlined" id="roleBannerIcon">shield</span>
+                    <span id="roleBannerText">Режим старосты</span>
                 </div>
-                <button class="text-btn" id="logoutAuthorBtn">Выйти</button>
             </div>
 
             <!-- Connection Status Pill -->
             <div class="status-pill" id="statusPill" style="display: none;">
                 <span class="material-symbols-outlined status-icon">cloud_done</span>
-                <span class="status-text" id="statusText">Синхронизировано с облаком</span>
+                <span class="status-text" id="statusText">Синхронизировано</span>
             </div>
 
             <!-- Cards Feed -->
@@ -106,13 +131,265 @@
             </div>
         </main>
 
-        <!-- Floating Action Button (M3 FAB) -->
-        <button class="fab" id="fabAddBtn" aria-label="Добавить домашнее задание">
+        <!-- Floating Action Button (M3 FAB - for class admins & super admin) -->
+        <button class="fab" id="fabAddBtn" aria-label="Добавить домашнее задание" style="display: none;">
             <span class="material-symbols-outlined fab-icon">edit_square</span>
             <span class="fab-label">Добавить Д/З</span>
         </button>
 
-        <!-- Add Homework Bottom Sheet Modal -->
+        <!-- ================================================================= -->
+        <!-- MODALS & BOTTOM SHEETS -->
+        <!-- ================================================================= -->
+
+        <!-- 1. RULES ONBOARDING MODAL (with mandatory checkboxes) -->
+        <div class="modal-backdrop" id="rulesModalBackdrop">
+            <div class="bottom-sheet rules-sheet" id="rulesSheet">
+                <div class="sheet-drag-handle"></div>
+                <div class="sheet-top">
+                    <div class="sheet-heading">
+                        <span class="material-symbols-outlined sheet-icon brand-color">verified_user</span>
+                        <h2 class="sheet-title">Правила сообщества</h2>
+                    </div>
+                </div>
+                <p class="sheet-subtitle">Добро пожаловать в закрытый портал 9В и 9А. Для продолжения подтвердите согласие с правилами:</p>
+
+                <div class="rules-checklist">
+                    <label class="rule-checkbox-card">
+                        <input type="checkbox" id="rule1" class="m3-checkbox">
+                        <div class="rule-text">
+                            <strong>1. Уважение и вежливость</strong>
+                            <span>Общаемся без мата, оскорблений, травли и токсичности в комментариях.</span>
+                        </div>
+                    </label>
+
+                    <label class="rule-checkbox-card">
+                        <input type="checkbox" id="rule2" class="m3-checkbox">
+                        <div class="rule-text">
+                            <strong>2. Достоверность заданий</strong>
+                            <span>Публикуем только реальные домашние задания, параграфы и проверенные ссылки.</span>
+                        </div>
+                    </label>
+
+                    <label class="rule-checkbox-card">
+                        <input type="checkbox" id="rule3" class="m3-checkbox">
+                        <div class="rule-text">
+                            <strong>3. Конфиденциальность</strong>
+                            <span>Одноразовые инвайт-коды и аккаунты предназначены строго для учеников нашего класса. Запрещено передавать их третьим лицам.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="sheet-actions">
+                    <button type="button" class="btn btn-filled" id="acceptRulesBtn" disabled>
+                        <span class="material-symbols-outlined">check</span>
+                        <span>Принять правила и продолжить</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. AUTH MODAL (Login / Register with one-time invite code) -->
+        <div class="modal-backdrop" id="authModalBackdrop">
+            <div class="bottom-sheet auth-sheet" id="authSheet">
+                <div class="sheet-drag-handle"></div>
+                <div class="sheet-top">
+                    <div class="sheet-heading">
+                        <span class="material-symbols-outlined sheet-icon">account_circle</span>
+                        <h2 class="sheet-title" id="authSheetTitle">Вход в аккаунт</h2>
+                    </div>
+                    <button class="icon-btn" id="closeAuthSheetBtn" aria-label="Закрыть">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Tabs: Login / Register -->
+                <div class="segmented-control auth-tabs" id="authTabs">
+                    <button class="segment-btn active" data-auth-tab="login">Вход</button>
+                    <button class="segment-btn" data-auth-tab="register">Регистрация</button>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <form id="loginForm" class="sheet-form">
+                    <div class="form-group">
+                        <label class="form-label" for="loginUsername">Логин</label>
+                        <div class="m3-input-box">
+                            <span class="material-symbols-outlined input-leading-icon">person</span>
+                            <input type="text" id="loginUsername" placeholder="Ваш логин" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">Пароль</label>
+                        <div class="m3-input-box">
+                            <span class="material-symbols-outlined input-leading-icon">lock</span>
+                            <input type="password" id="loginPassword" placeholder="Ваш пароль" required autocomplete="current-password">
+                        </div>
+                    </div>
+
+                    <div class="sheet-actions">
+                        <button type="submit" class="btn btn-filled full-width">
+                            <span>Войти</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- REGISTER FORM (With One-time Invite Code) -->
+                <form id="registerForm" class="sheet-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="regFullName">Имя и Фамилия</label>
+                        <div class="m3-input-box">
+                            <span class="material-symbols-outlined input-leading-icon">badge</span>
+                            <input type="text" id="regFullName" placeholder="Как вас зовут (для комментариев)" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="regUsername">Придумайте логин</label>
+                        <div class="m3-input-box">
+                            <span class="material-symbols-outlined input-leading-icon">person</span>
+                            <input type="text" id="regUsername" placeholder="Только буквы и цифры" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="regPassword">Придумайте пароль</label>
+                        <div class="m3-input-box">
+                            <span class="material-symbols-outlined input-leading-icon">key</span>
+                            <input type="password" id="regPassword" placeholder="Минимум 4 символа" required autocomplete="new-password">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Ваш класс</label>
+                        <div class="segmented-control" id="regClassControl">
+                            <button type="button" class="segment-btn active" data-reg-class="9v">9В класс</button>
+                            <button type="button" class="segment-btn" data-reg-class="9a">9А класс</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="regInviteCode">Одноразовый инвайт-код</label>
+                        <div class="m3-input-box invite-box">
+                            <span class="material-symbols-outlined input-leading-icon">confirmation_number</span>
+                            <input type="text" id="regInviteCode" placeholder="Например: 9V-XXXX-X" required style="text-transform: uppercase;">
+                        </div>
+                        <span class="field-hint">Код выдается главным админом индивидуально каждому ученику.</span>
+                    </div>
+
+                    <div class="sheet-actions">
+                        <button type="submit" class="btn btn-filled full-width">
+                            <span>Зарегистрироваться</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. PROFILE MODAL -->
+        <div class="modal-backdrop" id="profileModalBackdrop">
+            <div class="bottom-sheet profile-sheet" id="profileSheet">
+                <div class="sheet-drag-handle"></div>
+                <div class="profile-card">
+                    <div class="profile-avatar-large" id="profileAvatarLarge">?</div>
+                    <div class="profile-info">
+                        <h2 class="profile-name" id="profileNameDisplay">Гость</h2>
+                        <div class="profile-badges">
+                            <span class="profile-class-badge" id="profileClassBadge">Класс не выбран</span>
+                            <span class="profile-role-badge" id="profileRoleBadge">Ученик</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-menu-list">
+                    <button class="profile-menu-item" id="menuOpenRules">
+                        <span class="material-symbols-outlined">verified_user</span>
+                        <span>Правила сообщества</span>
+                    </button>
+                    <button class="profile-menu-item" id="menuSuperAdmin" style="display: none;">
+                        <span class="material-symbols-outlined">admin_panel_settings</span>
+                        <span>Панель Главного Админа</span>
+                    </button>
+                    <button class="profile-menu-item danger-item" id="logoutBtn">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span>Выйти из аккаунта</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SUPER ADMIN DASHBOARD MODAL -->
+        <div class="modal-backdrop" id="superAdminModalBackdrop">
+            <div class="bottom-sheet super-admin-sheet" id="superAdminSheet">
+                <div class="sheet-drag-handle"></div>
+                <div class="sheet-top">
+                    <div class="sheet-heading">
+                        <span class="material-symbols-outlined sheet-icon brand-color">admin_panel_settings</span>
+                        <h2 class="sheet-title">Главная Панель Управления</h2>
+                    </div>
+                    <button class="icon-btn" id="closeSuperAdminBtn" aria-label="Закрыть">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Admin Tabs -->
+                <div class="segmented-control" id="superAdminTabs">
+                    <button class="segment-btn active" data-admin-tab="generator">Генератор инвайтов</button>
+                    <button class="segment-btn" data-admin-tab="codes">Список кодов</button>
+                    <button class="segment-btn" data-admin-tab="reports">Жалобы</button>
+                </div>
+
+                <!-- TAB 1: INVITE GENERATOR -->
+                <div class="admin-tab-content" id="tabGenerator">
+                    <form id="generateCodeForm" class="sheet-form">
+                        <div class="form-group">
+                            <label class="form-label">Тип создаваемого инвайт-кода:</label>
+                            <div class="m3-input-box select-box">
+                                <span class="material-symbols-outlined input-leading-icon">key</span>
+                                <select id="inviteRoleSelect">
+                                    <option value="9v_student">Ученик 9В</option>
+                                    <option value="9a_student">Ученик 9А</option>
+                                    <option value="9v_admin">Староста / Админ 9В</option>
+                                    <option value="9a_admin">Староста / Админ 9А</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-filled">
+                            <span class="material-symbols-outlined">auto_fix_high</span>
+                            <span>Сгенерировать одноразовый код</span>
+                        </button>
+                    </form>
+
+                    <div class="generated-result-card" id="generatedResultCard" style="display: none;">
+                        <span class="result-label">Сгенерирован новый одноразовый код:</span>
+                        <div class="code-copy-row">
+                            <code class="code-value" id="generatedCodeValue">9V-XXXX-X</code>
+                            <button class="btn btn-tonal copy-btn" id="copyGeneratedCodeBtn">
+                                <span class="material-symbols-outlined">content_copy</span>
+                                <span>Скопировать</span>
+                            </button>
+                        </div>
+                        <span class="result-hint">Отправьте этот код однокласснику в Telegram или VK. Код сгорит сразу после его активации.</span>
+                    </div>
+                </div>
+
+                <!-- TAB 2: CODES LIST -->
+                <div class="admin-tab-content" id="tabCodes" style="display: none;">
+                    <div class="codes-list" id="adminCodesList">
+                        <p style="color: var(--md-sys-color-outline); font-size: 13px;">Загрузка кодов...</p>
+                    </div>
+                </div>
+
+                <!-- TAB 3: REPORTS -->
+                <div class="admin-tab-content" id="tabReports" style="display: none;">
+                    <div class="reports-list" id="adminReportsList">
+                        <p style="color: var(--md-sys-color-outline); font-size: 13px;">Жалоб нет.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. ADD HOMEWORK MODAL -->
         <div class="modal-backdrop" id="addModalBackdrop">
             <div class="bottom-sheet" id="addSheet">
                 <div class="sheet-drag-handle"></div>
@@ -127,13 +404,9 @@
                 </div>
 
                 <form id="addHomeworkForm" class="sheet-form">
-                    <!-- PIN input for first-time author login -->
-                    <div class="form-group" id="pinGroup">
-                        <label class="form-label" for="authorPinInput">PIN автора (для первой публикации)</label>
-                        <div class="m3-input-box">
-                            <span class="material-symbols-outlined input-leading-icon">pin</span>
-                            <input type="password" id="authorPinInput" placeholder="Введите PIN (по умолчанию: 1234)" inputmode="numeric" maxlength="8">
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Публикация для класса:</label>
+                        <div class="current-target-class-pill" id="targetClassPill">9В класс</div>
                     </div>
 
                     <div class="form-group">
@@ -193,7 +466,7 @@
             </div>
         </div>
 
-        <!-- Report Bottom Sheet Modal -->
+        <!-- 6. REPORT MODAL -->
         <div class="modal-backdrop" id="reportModalBackdrop">
             <div class="bottom-sheet report-sheet" id="reportSheet">
                 <div class="sheet-drag-handle"></div>
@@ -206,7 +479,7 @@
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
-                <p class="sheet-subtitle">Укажите причину жалобы. Сообщение будет передано автору:</p>
+                <p class="sheet-subtitle">Укажите причину жалобы. Сообщение будет передано старосте и главному админу:</p>
 
                 <form id="reportForm" class="sheet-form">
                     <input type="hidden" id="reportTargetType" value="">
@@ -234,7 +507,7 @@
                             <span class="radio-indicator"></span>
                             <div class="radio-texts">
                                 <span class="radio-title">Оскорбление или токсичность</span>
-                                <span class="radio-desc">Неприемлемые выражения в комментариях</span>
+                                <span class="radio-desc">Нарушение правил сообщества</span>
                             </div>
                         </label>
                         <label class="m3-radio-item">
