@@ -67,6 +67,11 @@
     --md-sys-color-on-tertiary-container: #d4e3ff;
 
     --sheet-backdrop: rgba(0, 0, 0, 0.65);
+
+    /* M3 Scrollbar Tokens */
+    --scrollbar-thumb: rgba(226, 226, 233, 0.28);
+    --scrollbar-thumb-hover: rgba(168, 199, 250, 0.6);
+    --scrollbar-thumb-active: #a8c7fa;
 }
 
 /* 3. LIGHT THEME (M3 Google Day Light) */
@@ -99,6 +104,11 @@
     --md-sys-color-on-tertiary-container: #001c3b;
 
     --sheet-backdrop: rgba(0, 0, 0, 0.4);
+
+    /* M3 Scrollbar Tokens */
+    --scrollbar-thumb: rgba(26, 28, 30, 0.28);
+    --scrollbar-thumb-hover: rgba(11, 87, 208, 0.55);
+    --scrollbar-thumb-active: #0b57d0;
 }
 
 /* 4. RESET & GLOBAL STYLES */
@@ -107,6 +117,52 @@
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+/* Google Material You (M3) Floating Capsule Scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: var(--radius-full);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    transition: background-color var(--motion-fast), border-width var(--motion-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+    border-width: 2px;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background-color: var(--scrollbar-thumb-active);
+    border-width: 2px;
+}
+
+::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 body {
