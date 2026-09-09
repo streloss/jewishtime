@@ -77,6 +77,10 @@ const snackbarEl = document.getElementById("snackbar");
 const snackbarMsg = document.getElementById("snackbarMsg");
 
 // MODALS
+// GUEST MODE CONFIG
+const ALLOW_GUEST_MODE = true; // Can be switched to false later to make site strictly private
+
+// MODALS
 const rulesModalBackdrop = document.getElementById("rulesModalBackdrop");
 const acceptRulesBtn = document.getElementById("acceptRulesBtn");
 const rule1 = document.getElementById("rule1");
@@ -89,6 +93,12 @@ const authTabs = document.getElementById("authTabs");
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 const regClassControl = document.getElementById("regClassControl");
+const guestModeSection = document.getElementById("guestModeSection");
+const guestLoginBtn = document.getElementById("guestLoginBtn");
+
+const classSwitcherLabel = document.getElementById("classSwitcherLabel");
+const classSwitcherSegments = document.getElementById("classSwitcherSegments");
+const guestBannerAuthBtn = document.getElementById("guestBannerAuthBtn");
 
 const profileModalBackdrop = document.getElementById("profileModalBackdrop");
 const profileAvatarLarge = document.getElementById("profileAvatarLarge");
@@ -97,6 +107,7 @@ const profileClassBadge = document.getElementById("profileClassBadge");
 const profileRoleBadge = document.getElementById("profileRoleBadge");
 const menuOpenRules = document.getElementById("menuOpenRules");
 const menuSuperAdmin = document.getElementById("menuSuperAdmin");
+const menuGuestAuth = document.getElementById("menuGuestAuth");
 const logoutBtn = document.getElementById("logoutBtn");
 
 const superAdminModalBackdrop = document.getElementById("superAdminModalBackdrop");
@@ -126,11 +137,13 @@ const cancelReportSheetBtn = document.getElementById("cancelReportSheetBtn");
 const reportForm = document.getElementById("reportForm");
 const reportTargetType = document.getElementById("reportTargetType");
 const reportTargetId = document.getElementById("reportTargetId");
+
 // 3. INITIALIZATION
 document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initSession();
     initRulesCheck();
+    initSequenceFlow(); // Master controller: Auth first -> Rules second
     initDefaultDate();
     initFilters();
     initModals();
@@ -140,15 +153,25 @@ document.addEventListener("DOMContentLoaded", () => {
 // 4. SESSION & AUTH CONTROLLER
 function initSession() {
     const savedUser = localStorage.getItem("student_auth_user");
+    const isGuest = localStorage.getItem("student_guest_mode") === "true";
+
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
-            if (currentUser.role !== "super_admin") {
+            if (currentUser.role !== "super_admin" && !currentUser.isGuest) {
                 currentViewClass = currentUser.classId || "9v";
             }
         } catch(e) {
             currentUser = null;
         }
+    } else if (isGuest && ALLOW_GUEST_MODE) {
+        currentUser = {
+            role: "guest",
+            fullName: "Гость (Демо)",
+            username: "guest",
+            classId: "9v",
+            isGuest: true
+        };
     }
     updateUserUI();
 }
@@ -156,13 +179,41 @@ function initSession() {
 function updateUserUI() {
     if (!currentUser) {
         headerAvatar.textContent = "?";
-        activeClassBadge.textContent = "Гость";
+        activeClassBadge.textContent = "Вход";
         superAdminBtn.style.display = "none";
         superAdminClassSwitcher.style.display = "none";
         roleBanner.style.display = "none";
         fabAddBtn.style.display = "none";
+        if (guestBannerAuthBtn) guestBannerAuthBtn.style.display = "none";
+        if (menuGuestAuth) menuGuestAuth.style.display = "none";
         return;
     }
+
+    if (currentUser.isGuest) {
+        headerAvatar.textContent = "Г";
+        profileAvatarLarge.textContent = "Г";
+        profileNameDisplay.textContent = "Гость (Демо-режим)";
+        profileClassBadge.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " (Демо)";
+        profileRoleBadge.textContent = "Демо";
+        activeClassBadge.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " (Демо)";
+
+        superAdminBtn.style.display = "none";
+        superAdminClassSwitcher.style.display = "flex";
+        if (classSwitcherLabel) classSwitcherLabel.textContent = "Демо-класс:";
+        menuSuperAdmin.style.display = "none";
+        if (menuGuestAuth) menuGuestAuth.style.display = "flex";
+
+        roleBanner.style.display = "flex";
+        roleBannerText.textContent = "Демо-режим: просмотр заданий 9В и 9А без комментариев";
+        if (guestBannerAuthBtn) guestBannerAuthBtn.style.display = "inline-flex";
+
+        fabAddBtn.style.display = "none";
+        targetClassPill.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " класс";
+        return;
+    }
+
+    if (guestBannerAuthBtn) guestBannerAuthBtn.style.display = "none";
+    if (menuGuestAuth) menuGuestAuth.style.display = "none";
 
     const initial = (currentUser.fullName || currentUser.username || "У")[0].toUpperCase();
     headerAvatar.textContent = initial;
@@ -181,6 +232,7 @@ function updateUserUI() {
         activeClassBadge.textContent = currentViewClass === "9a" ? "9А" : "9В";
         superAdminBtn.style.display = "flex";
         superAdminClassSwitcher.style.display = "flex";
+        if (classSwitcherLabel) classSwitcherLabel.textContent = "Просмотр класса:";
         menuSuperAdmin.style.display = "flex";
         roleBanner.style.display = "flex";
         roleBannerText.textContent = `Главный Админ (просмотр ${currentViewClass.toUpperCase()})`;
@@ -205,13 +257,30 @@ function updateUserUI() {
     targetClassPill.textContent = (currentViewClass === "9a" ? "9А" : "9В") + " класс";
 }
 
-// 5. RULES ONBOARDING (Mandatory Checkboxes)
-function initRulesCheck() {
-    const accepted = localStorage.getItem("student_rules_accepted") === "true";
-    if (!accepted) {
-        setTimeout(openRulesModal, 500);
+// 5. MASTER SEQUENCE FLOW (Auth First -> Rules Second)
+function initSequenceFlow() {
+    const savedUser = localStorage.getItem("student_auth_user");
+    const isGuest = localStorage.getItem("student_guest_mode") === "true";
+    const rulesAccepted = localStorage.getItem("student_rules_accepted") === "true";
+
+    // 1. Mandatory Auth First: if not logged in and not guest
+    if (!savedUser && !isGuest) {
+        setTimeout(() => {
+            openAuthModal(true);
+        }, 250);
+        return;
     }
 
+    // 2. Mandatory Rules Second: if logged in or guest, but rules not accepted
+    if (!rulesAccepted) {
+        setTimeout(() => {
+            openRulesModal(true);
+        }, 300);
+    }
+}
+
+// 6. RULES ONBOARDING (Mandatory Checkboxes)
+function initRulesCheck() {
     const checkAllRules = () => {
         acceptRulesBtn.disabled = !(rule1.checked && rule2.checked && rule3.checked);
     };
@@ -224,20 +293,27 @@ function initRulesCheck() {
         localStorage.setItem("student_rules_accepted", "true");
         closeRulesModal();
         showSnackbar("Правила приняты! Добро пожаловать.");
-
-        if (!currentUser) {
-            setTimeout(openAuthModal, 400);
-        }
     });
 
-    openRulesBtn.addEventListener("click", openRulesModal);
+    openRulesBtn.addEventListener("click", () => openRulesModal(false));
     menuOpenRules.addEventListener("click", () => {
         closeProfileModal();
-        openRulesModal();
+        openRulesModal(false);
+    });
+
+    rulesModalBackdrop.addEventListener("click", (e) => {
+        if (e.target === rulesModalBackdrop) {
+            if (rulesModalBackdrop.dataset.mandatory === "true") {
+                showSnackbar("Для продолжения необходимо ознакомиться и принять правила!");
+                return;
+            }
+            closeRulesModal();
+        }
     });
 }
 
-function openRulesModal() {
+function openRulesModal(isMandatory = false) {
+    rulesModalBackdrop.dataset.mandatory = isMandatory ? "true" : "false";
     rulesModalBackdrop.classList.add("open");
     document.body.style.overflow = "hidden";
 }
@@ -535,14 +611,24 @@ function createPostCard(post, todayStr, tomorrowStr) {
                 ${renderCommentsHtml(postComments)}
             </div>
 
-            <form class="comment-input-bar" data-post-id="${post.id}">
-                <div class="comment-row">
-                    <input type="text" class="comment-msg-input" placeholder="${currentUser ? 'Написать комментарий...' : 'Войдите, чтобы комментировать'}" maxlength="250" ${!currentUser ? 'disabled' : ''} required>
-                    <button type="submit" class="comment-send-btn" title="Отправить" ${!currentUser ? 'disabled' : ''}>
-                        <span class="material-symbols-outlined">arrow_upward</span>
-                    </button>
+            ${currentUser && !currentUser.isGuest ? `
+                <form class="comment-input-bar" data-post-id="${post.id}">
+                    <div class="comment-row">
+                        <input type="text" class="comment-msg-input" placeholder="Написать комментарий..." maxlength="250" required>
+                        <button type="submit" class="comment-send-btn" title="Отправить">
+                            <span class="material-symbols-outlined">arrow_upward</span>
+                        </button>
+                    </div>
+                </form>
+            ` : `
+                <div class="guest-comment-locked">
+                    <div class="locked-text">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--md-sys-color-primary);">lock</span>
+                        <span>Комментирование доступно только ученикам</span>
+                    </div>
+                    <button type="button" class="locked-btn guest-prompt-login-btn">Войти</button>
                 </div>
-            </form>
+            `}
         </div>
     `;
 
@@ -551,6 +637,13 @@ function createPostCard(post, todayStr, tomorrowStr) {
     toggleBtn.addEventListener("click", () => {
         commentsSec.classList.toggle("open");
     });
+
+    const promptLoginBtn = card.querySelector(".guest-prompt-login-btn");
+    if (promptLoginBtn) {
+        promptLoginBtn.addEventListener("click", () => {
+            openAuthModal(false);
+        });
+    }
 
     const reportBtn = card.querySelector(".report-btn");
     reportBtn.addEventListener("click", () => {
@@ -565,20 +658,22 @@ function createPostCard(post, todayStr, tomorrowStr) {
     }
 
     const commentForm = card.querySelector(".comment-input-bar");
-    commentForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (!currentUser) {
-            openAuthModal();
-            return;
-        }
+    if (commentForm) {
+        commentForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            if (!currentUser || currentUser.isGuest) {
+                openAuthModal(false);
+                return;
+            }
 
-        const msgInput = commentForm.querySelector(".comment-msg-input");
-        const text = msgInput.value.trim();
-        if (!text) return;
+            const msgInput = commentForm.querySelector(".comment-msg-input");
+            const text = msgInput.value.trim();
+            if (!text) return;
 
-        addComment(post.id, text);
-        msgInput.value = "";
-    });
+            addComment(post.id, text);
+            msgInput.value = "";
+        });
+    }
 
     card.querySelectorAll(".comment-report-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
@@ -628,7 +723,11 @@ function renderCommentsHtml(comments) {
 
 // 10. ACTIONS: ADD COMMENT
 async function addComment(postId, text) {
-    if (!currentUser) return;
+    if (!currentUser || currentUser.isGuest) {
+        showSnackbar("Гостям запрещено оставлять комментарии!");
+        openAuthModal(false);
+        return;
+    }
 
     const newComment = {
         postId: postId,
@@ -991,6 +1090,7 @@ function saveUserSession(user) {
     currentUser = user;
     currentViewClass = user.classId || "9v";
     localStorage.setItem("student_auth_user", JSON.stringify(user));
+    localStorage.removeItem("student_guest_mode");
     
     const saved = JSON.parse(localStorage.getItem("m3_registered_users") || "[]");
     if (!saved.some(u => u.username === user.username)) {
@@ -1000,6 +1100,38 @@ function saveUserSession(user) {
 
     updateUserUI();
     renderFeed();
+
+    // Check rules: if not accepted, trigger mandatory rules modal!
+    const rulesAccepted = localStorage.getItem("student_rules_accepted") === "true";
+    if (!rulesAccepted) {
+        setTimeout(() => {
+            openRulesModal(true);
+        }, 300);
+    }
+}
+
+function handleGuestLogin() {
+    localStorage.setItem("student_guest_mode", "true");
+    currentUser = {
+        role: "guest",
+        fullName: "Гость (Демо)",
+        username: "guest",
+        classId: "9v",
+        isGuest: true
+    };
+    currentViewClass = "9v";
+    closeAuthModal();
+    updateUserUI();
+    renderFeed();
+
+    const rulesAccepted = localStorage.getItem("student_rules_accepted") === "true";
+    if (!rulesAccepted) {
+        setTimeout(() => {
+            openRulesModal(true);
+        }, 300);
+    } else {
+        showSnackbar("Вы вошли в демо-режим (Гость)");
+    }
 }
 
 // 16. MODAL LISTENERS
@@ -1012,9 +1144,34 @@ function initModals() {
         }
     });
 
-    closeAuthSheetBtn.addEventListener("click", closeAuthModal);
+    if (guestLoginBtn) {
+        guestLoginBtn.addEventListener("click", handleGuestLogin);
+    }
+
+    if (guestBannerAuthBtn) {
+        guestBannerAuthBtn.addEventListener("click", () => openAuthModal(false));
+    }
+
+    if (menuGuestAuth) {
+        menuGuestAuth.addEventListener("click", () => {
+            closeProfileModal();
+            openAuthModal(false);
+        });
+    }
+
+    closeAuthSheetBtn.addEventListener("click", () => {
+        if (authModalBackdrop.dataset.mandatory === "true") return;
+        closeAuthModal();
+    });
+
     authModalBackdrop.addEventListener("click", (e) => {
-        if (e.target === authModalBackdrop) closeAuthModal();
+        if (e.target === authModalBackdrop) {
+            if (authModalBackdrop.dataset.mandatory === "true") {
+                showSnackbar("Необходимо войти или выбрать Демо-режим!");
+                return;
+            }
+            closeAuthModal();
+        }
     });
 
     authTabs.addEventListener("click", (e) => {
@@ -1068,10 +1225,14 @@ function initModals() {
         currentUser = null;
         currentViewClass = "9v";
         localStorage.removeItem("student_auth_user");
+        localStorage.removeItem("student_guest_mode");
         closeProfileModal();
         updateUserUI();
         renderFeed();
         showSnackbar("Вы вышли из аккаунта");
+        setTimeout(() => {
+            openAuthModal(true);
+        }, 350);
     });
 
     menuSuperAdmin.addEventListener("click", () => {
@@ -1145,7 +1306,11 @@ function initModals() {
     });
 }
 
-function openAuthModal() {
+function openAuthModal(isMandatory = false) {
+    authModalBackdrop.dataset.mandatory = isMandatory ? "true" : "false";
+    if (closeAuthSheetBtn) {
+        closeAuthSheetBtn.style.display = isMandatory ? "none" : "flex";
+    }
     authModalBackdrop.classList.add("open");
     document.body.style.overflow = "hidden";
 }
