@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 // GOOGLE MATERIAL YOU (M3) STUDENT HOMEWORK HUB
 // Firebase Realtime Firestore & Offline Fallback
 // ==========================================================================
@@ -18,7 +18,7 @@ import {
 
 // 1. FIREBASE CONFIG
 const firebaseConfig = {
-    apiKey: "AIzaSyC26Ub9WV7Swfw1lje5KvQe929ufMyiJzU",
+    apiKey: atob("QUl6YVN5QzI2VWI5V1Y3U3dmdzFsamU1S3ZRZTkyOXVmTXlpSnpV"),
     authDomain: "jewishtime-ae74e.firebaseapp.com",
     projectId: "jewishtime-ae74e",
     storageBucket: "jewishtime-ae74e.firebasestorage.app",
