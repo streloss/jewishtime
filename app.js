@@ -281,15 +281,51 @@ function initSequenceFlow() {
 
 // 6. RULES ONBOARDING (Mandatory Checkboxes)
 function initRulesCheck() {
-    const checkAllRules = () => {
-        acceptRulesBtn.disabled = !(rule1.checked && rule2.checked && rule3.checked);
-    };
+    const rulesChecklist = document.getElementById("rulesChecklist");
+    const cardRule1 = document.getElementById("cardRule1");
+    const cardRule2 = document.getElementById("cardRule2");
+    const cardRule3 = document.getElementById("cardRule3");
 
-    rule1.addEventListener("change", checkAllRules);
-    rule2.addEventListener("change", checkAllRules);
-    rule3.addEventListener("change", checkAllRules);
+    [rule1, rule2, rule3].forEach((r, idx) => {
+        r.addEventListener("change", () => {
+            const card = document.getElementById(`cardRule${idx + 1}`);
+            if (card && r.checked) {
+                card.classList.remove("has-error");
+            }
+        });
+    });
 
     acceptRulesBtn.addEventListener("click", () => {
+        const isR1 = rule1.checked;
+        const isR2 = rule2.checked;
+        const isR3 = rule3.checked;
+
+        // Reset previous animations and errors
+        if (rulesChecklist) rulesChecklist.classList.remove("shake-error");
+        acceptRulesBtn.classList.remove("shake-error");
+        [cardRule1, cardRule2, cardRule3].forEach(c => {
+            if (c) c.classList.remove("has-error");
+        });
+
+        if (!isR1 || !isR2 || !isR3) {
+            // Highlight unchecked cards in red
+            if (!isR1 && cardRule1) cardRule1.classList.add("has-error");
+            if (!isR2 && cardRule2) cardRule2.classList.add("has-error");
+            if (!isR3 && cardRule3) cardRule3.classList.add("has-error");
+
+            // Trigger left-right-center shake animation
+            if (rulesChecklist) {
+                void rulesChecklist.offsetWidth; // Force reflow
+                rulesChecklist.classList.add("shake-error");
+            }
+            acceptRulesBtn.classList.add("shake-error");
+
+            // Show error message with '!' logo
+            showSnackbar("Заполни галочки!", "error", "priority_high");
+            return;
+        }
+
+        // All 3 checkboxes confirmed
         localStorage.setItem("student_rules_accepted", "true");
         closeRulesModal();
         showSnackbar("Правила приняты! Добро пожаловать.");
@@ -304,7 +340,7 @@ function initRulesCheck() {
     rulesModalBackdrop.addEventListener("click", (e) => {
         if (e.target === rulesModalBackdrop) {
             if (rulesModalBackdrop.dataset.mandatory === "true") {
-                showSnackbar("Для продолжения необходимо ознакомиться и принять правила!");
+                showSnackbar("Заполни галочки!", "error", "priority_high");
                 return;
             }
             closeRulesModal();
@@ -1364,13 +1400,26 @@ function closeReportModal() {
 }
 
 // 17. UTILITIES
-function showSnackbar(message) {
+let snackbarTimer = null;
+function showSnackbar(message, type = "info", iconName = "check_circle") {
     if (!snackbarEl) return;
+    if (snackbarTimer) clearTimeout(snackbarTimer);
+
+    const snackbarIcon = document.getElementById("snackbarIcon");
+    if (snackbarIcon) {
+        snackbarIcon.textContent = iconName;
+    }
     snackbarMsg.textContent = message;
+
+    snackbarEl.classList.remove("error");
+    if (type === "error") {
+        snackbarEl.classList.add("error");
+    }
+
     snackbarEl.classList.add("show");
-    setTimeout(() => {
-        snackbarEl.classList.remove("show");
-    }, 3500);
+    snackbarTimer = setTimeout(() => {
+        snackbarEl.classList.remove("show", "error");
+    }, 3200);
 }
 
 function escapeHtml(text) {
